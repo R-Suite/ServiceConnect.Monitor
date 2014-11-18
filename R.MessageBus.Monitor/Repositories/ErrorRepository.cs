@@ -1,5 +1,4 @@
-﻿using System;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using R.MessageBus.Monitor.Interfaces;
 using R.MessageBus.Monitor.Models;

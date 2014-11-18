@@ -28,13 +28,17 @@ namespace R.MessageBus.Monitor.Repositories
             _serviceCollection.Update(
                 Query<Service>.EQ(x => x.Name, model.SourceAddress),
                 Update<Service>.AddToSet(x => x.InstanceLocation, model.SourceMachine).
-                                AddToSet(x => x.Out, model.TypeName),
+                                AddToSet(x => x.Out, model.TypeName).
+                                Set(x => x.Language, model.Language).
+                                Set(x => x.ConsumerType, model.ConsumerType),
                 UpdateFlags.Upsert);
 
             _serviceCollection.Update(
                 Query<Service>.EQ(x => x.Name, model.DestinationAddress),
                 Update<Service>.AddToSet(x => x.InstanceLocation, model.DestinationMachine).
-                                AddToSet(x => x.In, model.TypeName),
+                                AddToSet(x => x.In, model.TypeName).
+                                Set(x => x.Language, model.Language).
+                                Set(x => x.ConsumerType, model.ConsumerType),
                 UpdateFlags.Upsert);
 
             _serviceMessagesCollection.Update(

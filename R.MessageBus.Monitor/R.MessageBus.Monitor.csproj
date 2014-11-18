@@ -157,6 +157,7 @@
     <Compile Include="App_Start\StructuremapMvc.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Consumer.cs" />
+    <Compile Include="Controllers\HeartbeatController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\ServiceMessageController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
@@ -170,10 +171,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Handlers\AuditMessageHandler.cs" />
+    <Compile Include="Handlers\HearbeatMessageHandler.cs" />
     <Compile Include="Handlers\ErrorMessageHandler.cs" />
+    <Compile Include="Interfaces\IHeartbeatRepository.cs" />
     <Compile Include="Interfaces\IErrorRepository.cs" />
     <Compile Include="Interfaces\IAuditRepository.cs" />
     <Compile Include="Models\Audit.cs" />
+    <Compile Include="Models\Heartbeat.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\MessageException.cs" />
     <Compile Include="Models\QueryResult.cs" />
@@ -183,6 +187,7 @@
     <Compile Include="Repositories\AuditRepository.cs" />
     <Compile Include="Interfaces\IServiceMessageRepository.cs" />
     <Compile Include="Interfaces\IServiceRepository.cs" />
+    <Compile Include="Repositories\HeartbeatRepository.cs" />
     <Compile Include="Repositories\ServiceRepository.cs" />
     <Compile Include="Repositories\ServiceMessageRepository.cs" />
     <Compile Include="Repositories\ErrorRepository.cs" />
