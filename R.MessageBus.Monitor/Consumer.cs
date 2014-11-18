@@ -46,9 +46,6 @@ namespace R.MessageBus.Monitor
 
             string message = Encoding.UTF8.GetString(args.Body);
 
-            headers["ConsumerType"] = "RabbitMQ";
-            headers["Language"] = "C#";
-
             _consumerEventHandler(message, headers);
             _model.BasicAck(args.DeliveryTag, false);
         }
@@ -90,6 +87,23 @@ namespace R.MessageBus.Monitor
             var consumer = new EventingBasicConsumer();
             consumer.Received += Event;
             _model.BasicConsume(queueName, false, consumer);
+
+            string exchange = ConfigureExchange("TestExchange");
+            _model.QueueBind(queueName, exchange, string.Empty);
+        }
+
+        private string ConfigureExchange(string exchangeName)
+        {
+            try
+            {
+                _model.ExchangeDeclare(exchangeName, "fanout", true, true, null);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(string.Format("Error declaring exchange {0}", ex.Message));
+            }
+
+            return exchangeName;
         }
 
         private string ConfigureQueue()

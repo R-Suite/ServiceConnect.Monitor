@@ -98,4 +98,7 @@
     border: 1px solid lightgray;
     margin-bottom: 20px;
 }
-.serviceGrid {}
+.activeServiceCol {
+    text-align: center !important;
+    width: 5px;
+}

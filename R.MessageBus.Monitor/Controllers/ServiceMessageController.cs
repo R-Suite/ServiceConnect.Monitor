@@ -16,7 +16,7 @@ namespace R.MessageBus.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("serviceMessages")]
-        public IList<ServiceMessage> FindServices()
+        public IList<ServiceMessage> FindServiceMessages()
         {
             return _serviceMessageRepository.Find();
         }

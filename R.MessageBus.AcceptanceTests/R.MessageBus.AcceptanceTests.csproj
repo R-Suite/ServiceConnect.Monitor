@@ -96,6 +96,20 @@
       <DependentUpon>AuditMessages.feature</DependentUpon>
     </Compile>
     <Compile Include="AuditMessagesSteps.cs" />
+    <Compile Include="ErrorMessages.feature.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ErrorMessages.feature</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorMessagesSteps.cs" />
+    <Compile Include="HeartbeatMessages.feature.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HeartbeatMessages.feature</DependentUpon>
+    </Compile>
+    <Compile Include="HeartbeatMessagesSteps.cs" />
+    <Compile Include="TestErrorMessage.cs" />
+    <Compile Include="TestErrorConsumer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestConsumer.cs" />
     <Compile Include="TestMessage.cs" />
@@ -105,6 +119,14 @@
     <None Include="AuditMessages.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
       <LastGenOutput>AuditMessages.feature.cs</LastGenOutput>
+    </None>
+    <None Include="ErrorMessages.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>ErrorMessages.feature.cs</LastGenOutput>
+    </None>
+    <None Include="HeartbeatMessages.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>HeartbeatMessages.feature.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

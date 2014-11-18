@@ -12,7 +12,7 @@ define([
 
         initialize: function(options) {
             _.bindAll(this);
-            this.serviceCollection = options.serviceCollection;
+            this.endpointCollection = options.endpointCollection;
             this.serviceMessagesCollection = options.serviceMessagesCollection;
         },
 
@@ -25,7 +25,7 @@ define([
 
         _buidGraphModel: function() {
             var nodes = [];
-            this.serviceCollection.each(function(model) {
+            this.endpointCollection.each(function(model) {
                 nodes.push({
                     id: model.get("Name"),
                     label: model.get("Name")
@@ -37,7 +37,7 @@ define([
                 edges.push({
                     from: model.get("Out"),
                     to: model.get("In"),
-                    label: model.get("Type")
+                    label: model.get("Type") + " (" + model.get("Count") + ")"
                 });
             });
 

@@ -42,7 +42,7 @@ namespace R.MessageBus.Monitor.UnitTests.Controllers
             var handler = new ServiceMessageController(_mockRepository.Object);
 
             // Act
-            var results = handler.FindServices();
+            var results = handler.FindServiceMessages();
 
             // Assert
             var message1 = results.FirstOrDefault(x => x.Type == "Message1" && x.In == "Service1" && x.Out == "Service2");

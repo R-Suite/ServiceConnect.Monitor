@@ -12,19 +12,20 @@
                 spyOn(ServicesView.prototype, "render");
                 spyOn(EndpointGraphView.prototype, "render");
                 server = sinon.fakeServer.create();
-                server.respondWith("GET", "services",
-                    [
-                        200,
-                        { "Content-Type": "application/json" },
-                        '{"id":123,"Name":"TestService"}'
-                    ]
-                );
-
+                
                 server.respondWith("GET", "serviceMessages",
                     [
                         200,
                         { "Content-Type": "application/json" },
                         '{"id":321,"Name":"TestServiceMessage"}'
+                    ]
+                );
+
+                server.respondWith("GET", "endpoints",
+                    [
+                        200,
+                        { "Content-Type": "application/json" },
+                        '{"id":123,"Name":"TestService"}'
                     ]
                 );
             });
@@ -34,13 +35,13 @@
                 expect($.prototype.html).toHaveBeenCalled();
             });
 
-            it("should get a list of services", function () {
+            it("should get a list of endpoints", function () {
                 view.render();
                 server.respond();
-                expect(view.serviceCollection).not.toBeNull();
-                expect(view.serviceCollection.length).toEqual(1);
-                expect(view.serviceCollection.first().get("Name")).toEqual("TestService");
-                expect(view.serviceCollection.first().get("id")).toEqual(123);
+                expect(view.endpointCollection).not.toBeNull();
+                expect(view.endpointCollection.length).toEqual(1);
+                expect(view.endpointCollection.first().get("Name")).toEqual("TestService");
+                expect(view.endpointCollection.first().get("id")).toEqual(123);
             });
 
             it("should get a list of service messages", function () {
@@ -71,7 +72,7 @@
                 for (var i = 0; i < view.activeViews.length; i++) {
                     if (view.activeViews[i] instanceof EndpointGraphView) {
                         expect(view.activeViews[i].serviceMessagesCollection.first().get("Name")).toEqual("TestServiceMessage");
-                        expect(view.activeViews[i].serviceCollection.first().get("Name")).toEqual("TestService");
+                        expect(view.activeViews[i].endpointCollection.first().get("Name")).toEqual("TestService");
                         expect($.prototype.html).toHaveBeenCalledWith(view.activeViews[i].$el);
                     }
                 }

@@ -23,7 +23,7 @@ namespace R.MessageBus.AcceptanceTests
 
         public AuditMessagesSteps()
         {
-            var mongoClient = new MongoClient("mongodb://localhost/");
+            var mongoClient = new MongoClient("mongodb://localhost:37017/");
             MongoServer server = mongoClient.GetServer();
             var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
             _auditCollection = mongoDatabase.GetCollection<Audit>("Audit");
@@ -40,6 +40,8 @@ namespace R.MessageBus.AcceptanceTests
                 config.SetQueueName("R.MessageBus.Monitor.AcceptanceTests");
                 config.AddQueueMapping(typeof(TestMessage), "R.MessageBus.Monitor.AcceptanceTests");
                 config.ScanForMesssageHandlers = true;
+                config.TransportSettings.Username = "admin";
+                config.TransportSettings.Password = "Jx9wRvFrUeMKBWU";
             });
             _bus.StartConsuming();
         }

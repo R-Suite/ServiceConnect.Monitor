@@ -27,9 +27,11 @@ namespace R.MessageBus.Monitor.Repositories
             _heartbeatsCollection.Insert(model);
 
             _serviceCollection.Update(
-                Query<Service>.EQ(x => x.Name, model.ServiceName),
-                Update<Service>.AddToSet(x => x.InstanceLocation, model.Location).
-                                Set(x => x.Language, model.Language).
+                Query.And(
+                    Query<Service>.EQ(x => x.Name, model.ServiceName),
+                    Query<Service>.EQ(x => x.InstanceLocation, model.Location)
+                ),
+                Update<Service>.Set(x => x.Language, model.Language).
                                 Set(x => x.ConsumerType, model.ConsumerType).
                                 Set(x => x.LastHeartbeat, model.Timestamp),
                 UpdateFlags.Upsert);

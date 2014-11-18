@@ -3,14 +3,32 @@ define([
     'underscore',
     'jquery',
     'bower_components/requirejs-text/text!app/templates/services.html',
-    'backgrid'
-], function(Backbone, _, $, template, Backgrid) {
+    'backgrid',
+    "moment"
+], function(Backbone, _, $, template, Backgrid, moment) {
 
     "use strict";
 
     var view = Backbone.View.extend({
 
         columns: [{
+            label: "",
+            name: "Status",
+            cell: "html",
+            editable: false,
+            className: "activeServiceCol",
+            formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
+                fromRaw: function(rawValue) {
+                    if (rawValue === "Yellow") {
+                        return '<i class="fa fa-circle" style="color: #fecd5e;"></i>';
+                    } else if (rawValue === "Green") {
+                        return '<i class="fa fa-circle" style="color: #a1d26e;"></i>';
+                    } else {
+                        return '<i class="fa fa-circle" style="color: #fd685c;"></i>';
+                    }
+                }
+            })
+        }, {
             name: "Name",
             cell: "string",
             editable: false
@@ -18,7 +36,12 @@ define([
             Label: "Last Heartbeat",
             name: "LastHeartbeat",
             cell: "string",
-            editable: false
+            editable: false,
+            formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
+                fromRaw: function(rawValue) {
+                    return moment.utc(rawValue).format("DD/MM/YYYY");
+                }
+            })
         }, {
             name: "InstanceLocation",
             label: "Locations",
@@ -26,26 +49,27 @@ define([
             editable: false,
             formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
                 fromRaw: function(rawValue) {
-                    if (!rawValue) {
+                    if (rawValue === null || rawValue === undefined || rawValue === "") {
                         return "";
                     }
                     return rawValue.join(", ");
                 }
             })
         }, {
-            name: "LatestCpu",
-            label: "CPU",
+            name: "ConsumerType",
+            label: "Consumer Type",
             cell: "string",
             editable: false
         }, {
-            name: "LatestMemory",
-            label: "Memory",
+            name: "Language",
+            label: "Language",
             cell: "string",
             editable: false
         }, {
             label: "",
-            name: "id",
+            name: "Name",
             cell: "html",
+            className: "detailsCol",
             editable: false,
             formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
                 fromRaw: function(rawValue) {

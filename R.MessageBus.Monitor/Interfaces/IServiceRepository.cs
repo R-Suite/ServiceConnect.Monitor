@@ -6,5 +6,6 @@ namespace R.MessageBus.Monitor.Interfaces
     public interface IServiceRepository
     {
         IList<Service> Find();
+        IList<Service> FindByName(string name);
     }
 }

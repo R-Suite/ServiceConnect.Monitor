@@ -23,5 +23,10 @@ namespace R.MessageBus.Monitor.Repositories
         {
             return _serviceCollection.AsQueryable().ToList();
         }
+
+        public IList<Service> FindByName(string name)
+        {
+            return _serviceCollection.AsQueryable().Where(x => x.Name == name).ToList();
+        }
     }
 }
