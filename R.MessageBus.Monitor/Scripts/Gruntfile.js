@@ -89,6 +89,6 @@
 
     grunt.registerTask('server', ['connect', 'watch']);
     grunt.registerTask('test', ['connect', 'exec', 'watch']);
-    grunt.registerTask('default', ['cssmin', 'jsbeautifier', 'jshint', 'connect', 'watch']);
+    grunt.registerTask('default', ['cssmin', 'jsbeautifier', 'jshint', 'exec', 'watch']);
     grunt.registerTask('dist', ['jsbeautifier', 'jshint', 'cssmin', 'requirejs', 'sloc']);
 };
