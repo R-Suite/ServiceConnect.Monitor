@@ -1,9 +1,8 @@
-define([
-    'backbone',
-    'underscore',
-    'jquery',
-    'bower_components/requirejs-text/text!app/templates/endpointDetails.html'
-], function(Backbone, _, $, template) {
+define(['backbone',
+        'underscore',
+        'jquery',
+        'bower_components/requirejs-text/text!app/templates/endpointDetails.html'
+    ], function(Backbone, _, $, template) {
 
     "use strict";
 

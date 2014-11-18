@@ -1,4 +1,9 @@
-﻿define(["backbone", 'app/views/endpoints', "sinon", 'app/views/services', 'app/views/endpointGraph'], function (Backbone, EndpointsView, sinon, ServicesView, EndpointGraphView) {
+﻿define(["backbone",
+        'app/views/endpoints',
+        "sinon",
+        'app/views/services',
+        'app/views/endpointGraph'],
+    function (Backbone, EndpointsView, sinon, ServicesView, EndpointGraphView) {
 
     describe("Endpoints View", function () {
 

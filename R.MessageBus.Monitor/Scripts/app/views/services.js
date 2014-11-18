@@ -1,11 +1,10 @@
-define([
-    'backbone',
-    'underscore',
-    'jquery',
-    'bower_components/requirejs-text/text!app/templates/services.html',
-    'backgrid',
-    "moment"
-], function(Backbone, _, $, template, Backgrid, moment) {
+define(['backbone',
+        'underscore',
+        'jquery',
+        'bower_components/requirejs-text/text!app/templates/services.html',
+        'backgrid',
+        "moment"
+    ], function (Backbone, _, $, template, Backgrid, moment) {
 
     "use strict";
 

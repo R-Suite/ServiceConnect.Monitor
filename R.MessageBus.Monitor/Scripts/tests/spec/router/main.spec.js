@@ -3,15 +3,13 @@
         'app/routers/main',
         'app/views/endpoints',
         'app/views/navigation',
-        'app/views/endpointDetails',
-        'app/models/endpoint'],
+        'app/views/endpointDetails'],
     function (Backbone,
         sinon,
         MainRouter,
         EndpointsView,
         Navigation,
-        EndpointDetails,
-        EndpointModel) {
+        EndpointDetails) {
 
     describe("Main Router", function () {
 

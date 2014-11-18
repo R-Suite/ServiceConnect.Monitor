@@ -1,4 +1,11 @@
-﻿define(["backbone", "sinon", 'app/views/services', 'backgrid', 'jquery', 'underscore', 'backgrid-paginator'], function (Backbone, sinon, ServicesView, Backgrid, $, _) {
+﻿define(["backbone",
+        "sinon",
+        'app/views/services',
+        'backgrid',
+        'jquery',
+        'underscore',
+        'backgrid-paginator'],
+    function (Backbone, sinon, ServicesView, Backgrid, $, _) {
 
     describe("Services View", function () {
 

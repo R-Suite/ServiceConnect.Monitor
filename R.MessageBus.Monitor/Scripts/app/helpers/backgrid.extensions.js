@@ -1,8 +1,4 @@
-define([
-    'backbone',
-    'underscore',
-    'backgrid'
-], function(Backbone, _, Backgrid) {
+define(['backbone','underscore','backgrid'], function(Backbone, _, Backgrid) {
 
     "use strict";
 

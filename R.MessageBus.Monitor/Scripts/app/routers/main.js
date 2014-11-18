@@ -1,11 +1,12 @@
-define([
-    'backbone',
-    'app/views/endpoints',
-    'app/views/endpointDetails',
-    'app/views/navigation',
-    'app/models/endpoint'
-], function(Backbone, EndpointsView, EndpointDetailsView, Navigation, EndpointModel) {
-
+define(['backbone',
+        'app/views/endpoints',
+        'app/views/endpointDetails',
+        'app/views/navigation',
+        'app/models/endpoint'
+    ], function(Backbone, EndpointsView, EndpointDetailsView, Navigation, EndpointModel) {
+        
+    "use strict";
+        
     var router = Backbone.Router.extend({
 
         routes: {

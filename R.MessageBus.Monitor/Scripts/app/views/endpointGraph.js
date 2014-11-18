@@ -1,10 +1,9 @@
-define([
-    'backbone',
-    'underscore',
-    'jquery',
-    'bower_components/requirejs-text/text!app/templates/endPointGraph.html',
-    'vis'
-], function(Backbone, _, $, template, vis) {
+define(['backbone',
+        'underscore',
+        'jquery',
+        'bower_components/requirejs-text/text!app/templates/endPointGraph.html',
+        'vis'
+    ], function(Backbone, _, $, template, vis) {
 
     "use strict";
 
