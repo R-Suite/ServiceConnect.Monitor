@@ -2,12 +2,11 @@ define(['backbone',
         'underscore',
         'jquery',
         'bower_components/requirejs-text/text!app/templates/endpoints.html',
-        "app/collections/services",
         "app/collections/serviceMessages",
         "app/collections/endpoints",
         "app/views/services",
         "app/views/endpointGraph"
-    ], function (Backbone, _, $, template, ServiceCollection, ServiceMessagesCollection,
+    ], function (Backbone, _, $, template, ServiceMessagesCollection,
                  EndpointCollection, ServicesView, EndpointGraphView) {
 
     "use strict";
