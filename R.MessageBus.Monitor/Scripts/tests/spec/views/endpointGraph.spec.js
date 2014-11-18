@@ -11,13 +11,13 @@
 
     describe("Endpoint Graph View", function () {
 
-        var view, serviceCollection, serviceMessagesCollection, spy, htmlArgs, graphArgs, graphStub, graphSpy;
+        var view, endpointCollection, serviceMessagesCollection, spy, htmlArgs, graphArgs, graphStub, graphSpy;
 
         describe("Render", function() {
 
             beforeEach(function () {
                 
-                serviceCollection = new Backbone.PageableCollection([{
+                endpointCollection = new Backbone.PageableCollection([{
                     InstanceLocation: ["Location1", "Location2"],
                     Name: "TestService1",
                     In: ["Message1"],
@@ -45,7 +45,7 @@
                 }]);
                 
                 view = new EndpointGraphView({
-                    serviceCollection: serviceCollection,
+                    endpointCollection: endpointCollection,
                     serviceMessagesCollection: serviceMessagesCollection
                 });
                 

@@ -26,15 +26,19 @@ namespace R.MessageBus.Monitor.Repositories
             _auditCollection.Insert(model);
 
             _serviceCollection.Update(
-                Query<Service>.EQ(x => x.Name, model.SourceAddress),
-                Update<Service>.AddToSet(x => x.InstanceLocation, model.SourceMachine).
-                                AddToSet(x => x.Out, model.TypeName),
+                Query.And(
+                    Query<Service>.EQ(x => x.Name, model.SourceAddress),
+                    Query<Service>.EQ(x => x.InstanceLocation, model.SourceMachine)
+                ),
+                Update<Service>.AddToSet(x => x.Out, model.TypeName),
                 UpdateFlags.Upsert);
 
             _serviceCollection.Update(
-                Query<Service>.EQ(x => x.Name, model.DestinationAddress),
-                Update<Service>.AddToSet(x => x.InstanceLocation, model.DestinationMachine).
-                                AddToSet(x => x.In, model.TypeName),
+                Query.And(
+                    Query<Service>.EQ(x => x.Name, model.DestinationAddress),
+                    Query<Service>.EQ(x => x.InstanceLocation, model.DestinationMachine)
+                ),
+                Update<Service>.AddToSet(x => x.In, model.TypeName),
                 UpdateFlags.Upsert);
 
             _serviceMessagesCollection.Update(

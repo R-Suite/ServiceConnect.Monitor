@@ -8,15 +8,12 @@ namespace R.MessageBus.Monitor.Models
     {
         public ObjectId Id { get; set; }
 
-        public List<string> InstanceLocation { get; set; } 
+        public string InstanceLocation { get; set; } 
         public DateTime LastHeartbeat { get; set; }
         public string Name { get; set; }
 
         public List<string> In { get; set; }
-        public List<string> Out { get; set; } 
-
-        public List<ServiceMessage> MessagesIn { get; set; }
-        public List<ServiceMessage> MessagesOut { get; set; } 
-
+        public List<string> Out { get; set; }
+        public string Status { get; set; }
     }
 }

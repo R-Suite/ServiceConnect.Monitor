@@ -11,7 +11,8 @@
         "app/css/select2-bootstrap.css",
         "app/css/bootstrap.css",
         "bower_components/vis/dist/vis.min.css",
-        "app/css/style.css"
+        "app/css/style.css",
+        "bower_components/backgrid-moment-cell/backgrid-moment-cell.css"
     ];
 
     require("matchdep").filterDev("grunt-*").forEach(grunt.loadNpmTasks);
