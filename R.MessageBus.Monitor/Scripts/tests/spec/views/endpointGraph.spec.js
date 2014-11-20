@@ -37,11 +37,13 @@
                 serviceMessagesCollection = new Backbone.PageableCollection([{
                     Type: "Message1",
                     In: "TestService1",
-                    Out: "TestService2"
+                    Out: "TestService2",
+                    Count: 2
                 }, {
                     Type: "Message2",
                     In: "TestService2",
-                    Out: "TestService3"
+                    Out: "TestService3",
+                    Count: 3
                 }]);
                 
                 view = new EndpointGraphView({
@@ -86,13 +88,13 @@
                 match = _.findWhere(edges, {
                     from: "TestService2",
                     to: "TestService1",
-                    label: "Message1"
+                    label: "Message1 (2)"
                 });
                 expect(match).toBeTruthy();
                 match = _.findWhere(edges, {
                     from: "TestService3",
                     to: "TestService2",
-                    label: "Message2"
+                    label: "Message2 (3)"
                 });
                 expect(match).toBeTruthy();
             });

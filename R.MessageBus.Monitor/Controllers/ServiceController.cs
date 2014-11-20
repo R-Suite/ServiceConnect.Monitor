@@ -17,10 +17,23 @@ namespace R.MessageBus.Monitor.Controllers
         }
 
         [AcceptVerbs("GET")]
-        [Route("services/{name}")]
-        public IList<Service> FindServices(string name)
+        [Route("services")]
+        public IList<Service> FindServices()
         {
-            return _serviceRepository.FindByName(name);
+            var services = _serviceRepository.Find().OrderBy(x => x.Name).ToList();
+            foreach (Service service in services)
+            {
+                if (service.LastHeartbeat < DateTime.Now.Subtract(new TimeSpan(0, 0, 35)))
+                {
+                    service.Status = "Red";
+                }
+                else
+                {
+                    service.Status = "Green"; 
+                }
+            }
+
+            return services;
         }
 
         [AcceptVerbs("GET")]
@@ -33,11 +46,14 @@ namespace R.MessageBus.Monitor.Controllers
                 Out = x.First().Out,
                 LastHeartbeat = x.OrderBy(y => y.LastHeartbeat).First().LastHeartbeat,
                 Status = GetStatus(x.ToList()),
-                Name = x.First().Name
+                Name = x.First().Name,
+                InstanceLocation = string.Join(", ", x.Select(y => y.InstanceLocation)),
+                ConsumerType = x.First().ConsumerType,
+                Language = x.First().Language
             }).OrderBy(x => x.Name).ToList();
         }
 
-        public string GetStatus(List<Service> services)
+        private string GetStatus(List<Service> services)
         {
             if (services.All(x => x.LastHeartbeat < DateTime.Now.Subtract(new TimeSpan(0, 0, 35))))
             {

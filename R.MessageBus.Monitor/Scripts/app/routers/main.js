@@ -1,14 +1,19 @@
-define([
-    'backbone',
+define(['backbone',
     'app/views/endpoints',
-    'app/views/navigation'
-], function(Backbone, EndpointsView, Navigation) {
+    'app/views/endpointDetails',
+    'app/views/navigation',
+    'app/collections/heartbeats',
+    'moment'
+], function(Backbone, EndpointsView, EndpointDetailsView, Navigation, HeartbeatCollection, moment) {
+
+    "use strict";
 
     var router = Backbone.Router.extend({
 
         routes: {
             "": "endpoints",
-            "dashboard(/)": "endpoints"
+            "endpoints(/)": "endpoints",
+            "endpoint/:name/:location": "endpointDetails"
         },
 
         before: function(route) {
@@ -27,6 +32,27 @@ define([
         endpoints: function() {
             var view = new EndpointsView();
             this.renderView(view);
+        },
+
+        endpointDetails: function(name, location) {
+            var that = this;
+            var collection = new HeartbeatCollection();
+            var model = new Backbone.Model({
+                Name: name,
+                Location: location,
+                From: moment.utc().subtract(1, "hours").format(),
+                To: moment.utc().format()
+            });
+            collection.fetch({
+                data: model.attributes,
+                success: function() {
+                    var view = new EndpointDetailsView({
+                        collection: collection,
+                        model: model
+                    });
+                    that.renderView(view);
+                }
+            });
         }
     });
 

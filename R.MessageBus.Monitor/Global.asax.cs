@@ -15,6 +15,7 @@ namespace R.MessageBus.Monitor
     {
         private Consumer _errorConsumer;
         private Consumer _auditConsumer;
+        private Consumer _heartbeatConsumer;
 
         protected void Application_Start()
         {
@@ -26,6 +27,7 @@ namespace R.MessageBus.Monitor
 
             var auditHandler = new AuditMessageHandler(ObjectFactory.GetInstance<IAuditRepository>());
             var errorHandler = new ErrorMessageHandler(ObjectFactory.GetInstance<IErrorRepository>());
+            var heartBeatHandler = new HearbeatMessageHandler(ObjectFactory.GetInstance<IHeartbeatRepository>());
 
             string host = WebConfigurationManager.AppSettings["Host"];
             string username = WebConfigurationManager.AppSettings["Username"];
@@ -34,12 +36,15 @@ namespace R.MessageBus.Monitor
             _auditConsumer.StartConsuming(auditHandler.Execute, WebConfigurationManager.AppSettings["AuditQueue"]);
             _errorConsumer = new Consumer(host, username, password);
             _errorConsumer.StartConsuming(errorHandler.Execute, WebConfigurationManager.AppSettings["ErrorQueue"]);
+            _heartbeatConsumer = new Consumer(host, username, password);
+            _heartbeatConsumer.StartConsuming(heartBeatHandler.Execute, WebConfigurationManager.AppSettings["HeartbeatQueue"]);
         }
 
         protected void Application_End(object sender, EventArgs e)
         {
             _auditConsumer.Dispose();
             _errorConsumer.Dispose();
+            _heartbeatConsumer.Dispose();
         }
     }
 }

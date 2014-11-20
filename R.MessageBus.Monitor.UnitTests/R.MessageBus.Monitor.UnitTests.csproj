@@ -53,9 +53,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\HeartbeatControllerTests.cs" />
     <Compile Include="Controllers\ServiceControllerTests.cs" />
     <Compile Include="Controllers\ServiceMessageControllerTests.cs" />
     <Compile Include="Handlers\AuditHandlerTests.cs" />
+    <Compile Include="Handlers\HearbeatHandlerTests.cs" />
     <Compile Include="Handlers\ErrorHandlerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

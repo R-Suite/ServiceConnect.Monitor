@@ -157,6 +157,7 @@
     <Compile Include="App_Start\StructuremapMvc.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Consumer.cs" />
+    <Compile Include="Controllers\HeartbeatController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Controllers\ServiceMessageController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
@@ -170,10 +171,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Handlers\AuditMessageHandler.cs" />
+    <Compile Include="Handlers\HearbeatMessageHandler.cs" />
     <Compile Include="Handlers\ErrorMessageHandler.cs" />
+    <Compile Include="Interfaces\IHeartbeatRepository.cs" />
     <Compile Include="Interfaces\IErrorRepository.cs" />
     <Compile Include="Interfaces\IAuditRepository.cs" />
     <Compile Include="Models\Audit.cs" />
+    <Compile Include="Models\Heartbeat.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\MessageException.cs" />
     <Compile Include="Models\QueryResult.cs" />
@@ -182,7 +186,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\AuditRepository.cs" />
     <Compile Include="Interfaces\IServiceMessageRepository.cs" />
-    <Compile Include="Interfaces\IEndpointRepository.cs" />
+    <Compile Include="Repositories\HeartbeatRepository.cs" />
+    <Compile Include="Interfaces\IServiceRepository.cs" />
     <Compile Include="Repositories\ServiceRepository.cs" />
     <Compile Include="Repositories\ServiceMessageRepository.cs" />
     <Compile Include="Repositories\ErrorRepository.cs" />
@@ -191,31 +196,42 @@
   <ItemGroup>
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\app\collections\heartbeats.js" />
     <Content Include="Scripts\app\collections\endpoints.js" />
     <Content Include="Scripts\app\collections\serviceMessages.js" />
     <Content Include="Scripts\app\collections\services.js" />
+    <Content Include="Scripts\app\css\bootstrap-datetimepicker.min.css" />
     <Content Include="Scripts\app\css\bootstrap.css" />
     <Content Include="Scripts\app\css\style.css" />
     <Content Include="Scripts\app\css\select2-bootstrap.css" />
     <Content Include="Scripts\app\helpers\backbone.extensions.js" />
     <Content Include="Scripts\app\helpers\backgrid.extensions.js" />
     <Content Include="Scripts\app\helpers\underscore.extensions.js" />
+    <Content Include="Scripts\app\lib\bootstrap-datetimepicker.js" />
     <Content Include="Scripts\app\routers\main.js" />
+    <Content Include="Scripts\app\templates\serviceGraph.html" />
+    <Content Include="Scripts\app\templates\serviceTable.html" />
+    <Content Include="Scripts\app\templates\endpointDetails.html" />
     <Content Include="Scripts\app\templates\navigation.html" />
     <Content Include="Scripts\app\templates\services.html" />
     <Content Include="Scripts\app\templates\endpointGraph.html" />
     <Content Include="Scripts\app\templates\endpoints.html" />
+    <Content Include="Scripts\app\views\serviceTable.js" />
+    <Content Include="Scripts\app\views\serviceGraph.js" />
+    <Content Include="Scripts\app\views\endpointDetails.js" />
     <Content Include="Scripts\app\views\navigation.js" />
     <Content Include="Scripts\app\views\endpointGraph.js" />
     <Content Include="Scripts\app\views\services.js" />
     <Content Include="Scripts\app\views\endpoints.js" />
     <Content Include="Scripts\dist\r.messagebus.monitor.min.css" />
     <Content Include="Scripts\fonts\fontawesome-webfont.svg" />
+    <Content Include="Scripts\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Scripts\Gruntfile.js" />
     <Content Include="Scripts\main.js" />
     <Content Include="Scripts\tests\main.js" />
     <Content Include="Scripts\tests\run-jasmine.js" />
     <Content Include="Scripts\tests\spec\router\main.spec.js" />
+    <Content Include="Scripts\tests\spec\views\endpointDetails.spec.js" />
     <Content Include="Scripts\tests\spec\views\navigation.spec.js" />
     <Content Include="Scripts\tests\spec\views\endpointGraph.spec.js" />
     <Content Include="Scripts\tests\spec\views\services.spec.js" />
@@ -233,6 +249,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Scripts\app\models\" />
+    <Folder Include="Scripts\tests\spec\models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -252,6 +269,11 @@
     <Content Include="Scripts\fonts\fontawesome-webfont.ttf" />
     <Content Include="Scripts\fonts\fontawesome-webfont.woff" />
     <Content Include="Scripts\fonts\FontAwesome.otf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Scripts\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Scripts\fonts\glyphicons-halflings-regular.woff" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

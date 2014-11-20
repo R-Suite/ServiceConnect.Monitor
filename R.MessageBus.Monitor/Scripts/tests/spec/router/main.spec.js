@@ -1,4 +1,15 @@
-﻿define(["backbone", 'app/routers/main', 'app/views/endpoints', 'app/views/navigation'], function (Backbone, MainRouter, EndpointsView, Navigation) {
+﻿define(["backbone",
+        "sinon",
+        'app/routers/main',
+        'app/views/endpoints',
+        'app/views/navigation',
+        'app/views/endpointDetails'],
+    function (Backbone,
+        sinon,
+        MainRouter,
+        EndpointsView,
+        Navigation,
+        EndpointDetails) {
 
     describe("Main Router", function () {
 
@@ -8,6 +19,7 @@
 
             beforeEach(function () {
                 spyOn(MainRouter.prototype, 'endpoints');
+                spyOn(MainRouter.prototype, 'endpointDetails');
                 spyOn(MainRouter.prototype.__proto__, 'closeViews');
                 spyOn(Navigation.prototype, 'render');
                 spyOn(Navigation.prototype, 'setActive');
@@ -23,6 +35,11 @@
             it("endpoints route routes to endpoints", function () {
                 Backbone.history.navigate('endpoints', { trigger: true });
                 expect(MainRouter.prototype.endpoints).toHaveBeenCalled();
+            });
+            
+            it("endpoint/:name/:location route routes to endpointDetails", function () {
+                Backbone.history.navigate('endpoint/123/321', { trigger: true });
+                expect(MainRouter.prototype.endpointDetails).toHaveBeenCalled();
             });
 
             it("closeViews method called when routing", function () {
@@ -81,6 +98,53 @@
             afterEach(function () {
                 Backbone.history.navigate('', { trigger: false });
                 Backbone.history.stop();
+            });
+        });
+        
+        describe("Endpoint/:name/:location Route", function () {
+
+            var spy, collection, server;
+
+            beforeEach(function () {
+                spyOn(EndpointDetails.prototype, 'render');
+                server = sinon.fakeServer.create();
+
+                server.respondWith("GET", /heartbeats*/,
+                    [
+                        200,
+                        { "Content-Type": "application/json" },
+                        '[{"id":"123", "Name":"test"}]'
+                    ]
+                );
+                
+                spy = sinon.stub(EndpointDetails.prototype, "initialize", function (a) {
+                    collection = a.collection;
+                    return sinon.stub();
+                });
+
+                router = new MainRouter();
+                Backbone.history.start();
+            });
+
+            it("endpoint details route should render endpoint view", function () {
+                Backbone.history.navigate('endpoint/123/321', { trigger: true });
+                server.respond();
+                expect(EndpointDetails.prototype.render).toHaveBeenCalled();
+            });
+            
+            it("endpoint details should pass model to view", function () {
+                Backbone.history.navigate('endpoint/123/321', { trigger: true });
+                server.respond();
+                var model = collection.first();
+                expect(EndpointDetails.prototype.initialize.called).toBeTruthy();
+                expect(model.get("id")).toEqual("123");
+                expect(model.get("Name")).toEqual("test");
+            });
+
+            afterEach(function () {
+                Backbone.history.navigate('', { trigger: false });
+                Backbone.history.stop();
+                EndpointDetails.prototype.initialize.restore();
             });
         });
             

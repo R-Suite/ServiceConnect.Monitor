@@ -1,5 +1,4 @@
-define([
-    'backbone',
+define(['backbone',
     'underscore',
     'jquery',
     'bower_components/requirejs-text/text!app/templates/navigation.html'
@@ -22,7 +21,11 @@ define([
 
         setActive: function(route) {
             this.$el.find(".navigationItems").removeClass("active");
-            this.$el.find("." + route).addClass("active");
+
+            try {
+                this.$el.find("." + route).addClass("active");
+
+            } catch (e) {}
         }
     });
 

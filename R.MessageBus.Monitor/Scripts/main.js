@@ -13,9 +13,19 @@
         'backgrid-filter': 'bower_components/backgrid-filter/backgrid-filter',
         'backgrid-paginator': 'bower_components/backgrid-paginator/backgrid-paginator',
         'moment': "bower_components/moment/moment",
-        "vis": "bower_components/vis/dist/vis"
+        "vis": "bower_components/vis/dist/vis",
+        "datetimepicker": "app/lib/bootstrap-datetimepicker",
+        "d3": "bower_components/d3/d3",
+        "c3": "bower_components/c3/c3"
     },
     shim: {
+        "d3": {
+            exports: "d3"
+        },
+        "c3": {
+            deps: ["d3"],
+            exports: "c3"
+        },
         'backbone-pageable': {
             deps: ["backbone", "underscore", "jquery"]
         },
@@ -62,7 +72,8 @@ require(['backbone',
          'app/helpers/backbone.extensions',
          'app/helpers/underscore.extensions',
          'app/helpers/backgrid.extensions',
-         "vis"],
+         "vis",
+         "datetimepicker"],
 function (Backbone, $, toastr, Router) {
     Backbone.Application = {};
     Backbone.Application.Router = new Router();

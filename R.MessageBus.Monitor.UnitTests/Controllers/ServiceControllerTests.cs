@@ -68,13 +68,13 @@ namespace R.MessageBus.Monitor.UnitTests.Controllers
         }
 
         [Fact]
-        public void ShouldFindAllServiceMessages()
+        public void ShouldFindAllServices()
         {
             // Arrange
             var handler = new ServiceController(_mockRepository.Object);
 
             // Act
-            var results = handler.FindServices("Service1");
+            var results = handler.FindServices();
 
             // Assert
             var service1 = results.FirstOrDefault(x => x.Name == "Service1" && x.In.Contains("Message1") && x.Out.Contains("Message2") && x.InstanceLocation == "Loc1");

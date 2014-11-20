@@ -1,4 +1,9 @@
-﻿define(["backbone", "sinon", 'app/views/navigation', 'jquery', 'underscore'], function (Backbone, sinon, Navigation, $, _) {
+﻿define(["backbone",
+        "sinon",
+        'app/views/navigation',
+        'jquery',
+        'underscore'],
+    function (Backbone, sinon, Navigation, $, _) {
 
     describe("Navigation View", function () {
 

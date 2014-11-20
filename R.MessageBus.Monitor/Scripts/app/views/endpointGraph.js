@@ -1,5 +1,4 @@
-define([
-    'backbone',
+define(['backbone',
     'underscore',
     'jquery',
     'bower_components/requirejs-text/text!app/templates/endPointGraph.html',
@@ -24,13 +23,6 @@ define([
         },
 
         _buidGraphModel: function() {
-            var nodes = [];
-            this.endpointCollection.each(function(model) {
-                nodes.push({
-                    id: model.get("Name"),
-                    label: model.get("Name")
-                });
-            });
 
             var edges = [];
             this.serviceMessagesCollection.each(function(model) {
@@ -39,6 +31,19 @@ define([
                     to: model.get("In"),
                     label: model.get("Type") + " (" + model.get("Count") + ")"
                 });
+            });
+
+            var nodes = [];
+            this.endpointCollection.each(function(model) {
+                var edgeExists = _.find(edges, function(edge) {
+                    return (edge.from === model.get("Name") || edge.to === model.get("Name")) && edge.to != edge.from;
+                });
+                if (edgeExists) {
+                    nodes.push({
+                        id: model.get("Name"),
+                        label: model.get("Name")
+                    });
+                }
             });
 
             this.nodes = nodes;

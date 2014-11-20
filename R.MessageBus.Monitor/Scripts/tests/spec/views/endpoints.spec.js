@@ -1,4 +1,9 @@
-﻿define(["backbone", 'app/views/endpoints', "sinon", 'app/views/services', 'app/views/endpointGraph'], function (Backbone, EndpointsView, sinon, ServicesView, EndpointGraphView) {
+﻿define(["backbone",
+        'app/views/endpoints',
+        "sinon",
+        'app/views/services',
+        'app/views/endpointGraph'],
+    function (Backbone, EndpointsView, sinon, ServicesView, EndpointGraphView) {
 
     describe("Endpoints View", function () {
 
@@ -22,6 +27,14 @@
                 );
 
                 server.respondWith("GET", "endpoints",
+                    [
+                        200,
+                        { "Content-Type": "application/json" },
+                        '{"id":123,"Name":"TestService"}'
+                    ]
+                );
+
+                server.respondWith("GET", "services",
                     [
                         200,
                         { "Content-Type": "application/json" },

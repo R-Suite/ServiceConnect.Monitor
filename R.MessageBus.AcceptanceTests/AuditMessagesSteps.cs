@@ -40,6 +40,8 @@ namespace R.MessageBus.AcceptanceTests
                 config.SetQueueName("R.MessageBus.Monitor.AcceptanceTests");
                 config.AddQueueMapping(typeof(TestMessage), "R.MessageBus.Monitor.AcceptanceTests");
                 config.ScanForMesssageHandlers = true;
+                config.TransportSettings.Username = "guest";
+                config.TransportSettings.Password = "guest";
             });
             _bus.StartConsuming();
         }

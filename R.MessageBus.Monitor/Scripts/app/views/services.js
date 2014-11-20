@@ -1,5 +1,4 @@
-define([
-    'backbone',
+define(['backbone',
     'underscore',
     'jquery',
     'bower_components/requirejs-text/text!app/templates/services.html',
@@ -39,32 +38,31 @@ define([
             editable: false,
             formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
                 fromRaw: function(rawValue) {
-                    return moment.utc(rawValue).format("DD/MM/YYYY");
+                    return moment.utc(rawValue).format("DD/MM/YYYY HH:mm:ss");
                 }
             })
         }, {
             name: "InstanceLocation",
-            label: "Locations",
+            label: "Location",
             cell: "string",
+            editable: false
+        }, {
+            name: "LatestMemory",
+            label: "Memory (mb)",
+            cell: "number",
             editable: false,
+            decimals: 2,
             formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
                 fromRaw: function(rawValue) {
-                    if (rawValue === null || rawValue === undefined || rawValue === "") {
-                        return "";
-                    }
-                    return rawValue.join(", ");
+                    return (rawValue / Math.pow(1024, 2)).toFixed(2);
                 }
             })
         }, {
-            name: "ConsumerType",
-            label: "Consumer Type",
-            cell: "string",
-            editable: false
-        }, {
-            name: "Language",
-            label: "Language",
-            cell: "string",
-            editable: false
+            name: "LatestCpu",
+            label: "Latest CPU",
+            cell: "percent",
+            editable: false,
+            decimals: 2
         }, {
             label: "",
             name: "Name",
@@ -72,8 +70,8 @@ define([
             className: "detailsCol",
             editable: false,
             formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
-                fromRaw: function(rawValue) {
-                    return "<a href='#services/details/" + rawValue + "' >Details</a>";
+                fromRaw: function(rawValue, model) {
+                    return "<a href='#endpoint/" + rawValue + "/" + model.get("InstanceLocation") + "' >Details</a>";
                 }
             })
         }],
