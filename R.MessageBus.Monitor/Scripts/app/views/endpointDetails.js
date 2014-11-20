@@ -19,6 +19,7 @@ define(['backbone',
 
         initialize: function() {
             _.bindAll(this);
+            Backbone.Hubs.AuditHub.on("heartbeats", this._addHeartbeats);
         },
 
         render: function() {
@@ -33,16 +34,16 @@ define(['backbone',
             this.$el.find('.from').val(moment.utc(this.model.get("From")).format("DD/MM/YYYY HH:mm:ss"));
             this.$el.find('.to').val(moment.utc(this.model.get("To")).format("DD/MM/YYYY HH:mm:ss"));
 
-            var serviceTable = new ServiceTableView({
+            this.serviceTable = new ServiceTableView({
                 collection: this.collection
             });
-            this.renderView(serviceTable);
-            this.$el.find(".serviceTable").html(serviceTable.$el);
-            var serviceGraph = new ServiceGraphView({
+            this.renderView(this.serviceTable);
+            this.$el.find(".serviceTable").html(this.serviceTable.$el);
+            this.serviceGraph = new ServiceGraphView({
                 collection: this.collection.fullCollection
             });
-            this.renderView(serviceGraph);
-            this.$el.find(".serviceGraph").html(serviceGraph.$el);
+            this.renderView(this.serviceGraph);
+            this.$el.find(".serviceGraph").html(this.serviceGraph.$el);
             return this;
         },
 
@@ -53,6 +54,17 @@ define(['backbone',
                 data: this.model.attributes,
                 reset: true
             });
+        },
+
+        _addHeartbeats: function(heartbeats) {
+            for (var i = 0; i < heartbeats.length; i++) {
+                this.collection.add(new Backbone.Model(heartbeats[i]));
+            }    
+            this.serviceGraph.addHeartbeats(heartbeats);
+        },
+        
+        onClose: function() {
+            Backbone.Hubs.AuditHub.off("heartbeats", this._addHeartbeats);
         }
     });
 

@@ -16,7 +16,9 @@
         "vis": "bower_components/vis/dist/vis",
         "datetimepicker": "app/lib/bootstrap-datetimepicker",
         "d3": "bower_components/d3/d3",
-        "c3": "bower_components/c3/c3"
+        "c3": "bower_components/c3/c3",
+        'signalr.hubs': "app/lib/signalr.hubs",
+        "signalr": "bower_components/signalr/jquery.signalR"
     },
     shim: {
         "d3": {
@@ -58,6 +60,13 @@
         },
         'backbone.stickit': {
             deps: ["backbone", "underscore", "jquery"]
+        },
+        'signalr': {
+            deps: ["jquery"],
+            exports: '$'
+        },
+        "signalr.hubs": {
+            deps: ["signalr"]
         }
     },
     waitSeconds: 200
@@ -73,10 +82,22 @@ require(['backbone',
          'app/helpers/underscore.extensions',
          'app/helpers/backgrid.extensions',
          "vis",
-         "datetimepicker"],
+         "datetimepicker",
+         'signalr',
+         "signalr.hubs"],
 function (Backbone, $, toastr, Router) {
     Backbone.Application = {};
     Backbone.Application.Router = new Router();
+
+    Backbone.Hubs = {
+        AuditHub: $.connection.auditHub,
+        ErrorHub: $.connection.errorHub,
+        HeartbeatHub: $.connection.heartbeatHub
+    };
+    Backbone.Hubs.AuditHub.client.init = function () { };
+    Backbone.Hubs.ErrorHub.client.init = function () { };
+    Backbone.Hubs.HeartbeatHub.client.init = function () { };
+
     toastr.options = {
         "closeButton": false,
         "debug": false,
@@ -91,5 +112,7 @@ function (Backbone, $, toastr, Router) {
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
     };
-    Backbone.history.start();
+    $.connection.hub.start().done(function() {
+        Backbone.history.start();
+    });
 });

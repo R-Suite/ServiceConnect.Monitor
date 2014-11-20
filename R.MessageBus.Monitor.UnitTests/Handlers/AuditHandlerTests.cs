@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Microsoft.AspNet.SignalR;
 using Moq;
 using R.MessageBus.Monitor.Handlers;
 using R.MessageBus.Monitor.Interfaces;
@@ -13,10 +14,12 @@ namespace R.MessageBus.Monitor.UnitTests.Handlers
     {
         private readonly Mock<IAuditRepository> _mockRepository;
         private readonly Dictionary<string, string> _headers;
+        private Mock<IHubContext> _mockContext;
 
         public AuditHandlerTests()
         {
             _mockRepository = new Mock<IAuditRepository>();
+            _mockContext = new Mock<IHubContext>();
             _mockRepository.Setup(x => x.InsertAudit(It.IsAny<Audit>()));
 
             _headers = new Dictionary<string, string>
@@ -41,7 +44,7 @@ namespace R.MessageBus.Monitor.UnitTests.Handlers
         public void ShouldInsertAuditMessageAndHeadersIntoRepository()
         {
             // Arrange
-            var handler = new AuditMessageHandler(_mockRepository.Object);
+            var handler = new AuditMessageHandler(_mockRepository.Object, _mockContext.Object);
 
             // Act
             handler.Execute("TestMessage", _headers);
