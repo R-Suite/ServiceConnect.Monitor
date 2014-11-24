@@ -24,9 +24,19 @@ namespace R.MessageBus.Monitor.Repositories
             return _serviceCollection.AsQueryable().ToList();
         }
 
+        public Service Find(string name, string location)
+        {
+            return _serviceCollection.AsQueryable().FirstOrDefault(x => x.Name == name && x.InstanceLocation == location);
+        }
+
         public IList<Service> FindByName(string name)
         {
             return _serviceCollection.AsQueryable().Where(x => x.Name == name).ToList();
+        }
+
+        public void Update(Service model)
+        {
+            _serviceCollection.Save(model);
         }
     }
 }

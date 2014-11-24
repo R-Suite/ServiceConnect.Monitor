@@ -17,5 +17,6 @@ namespace R.MessageBus.Monitor.Models
         public string Status { get; set; }
         public double LatestCpu { get; set; }
         public double LatestMemory { get; set; }
+        public List<string> Tags { get; set; }
     }
 }

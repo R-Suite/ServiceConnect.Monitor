@@ -1,33 +1,25 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Threading;
-using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using R.MessageBus.Monitor.Interfaces;
 using R.MessageBus.Monitor.Models;
 
 namespace R.MessageBus.Monitor.Handlers
 {
-    public class ErrorMessageHandler : IDisposable
+    public class ErrorMessageHandler
     {
         private readonly IErrorRepository _errorRepository;
-        private readonly IHubContext _hub;
-        private readonly IList<Error> _errors = new List<Error>();
-        private readonly Timer _timer;
+        private readonly object _lock = new object();
 
-        public ErrorMessageHandler(IErrorRepository errorRepository, IHubContext hub)
+        public ErrorMessageHandler(IErrorRepository errorRepository)
         {
             _errorRepository = errorRepository;
-            _hub = hub;
-            var callback = new TimerCallback(SendErrors);
-            _timer = new Timer(callback, null, 0, 200);
         }
         
         public void Execute(string message, IDictionary<string, string> headers)
         {
-            lock (_errors)
+            lock (_lock)
             {
                 var error = new Error
                 {
@@ -49,23 +41,7 @@ namespace R.MessageBus.Monitor.Handlers
                 };
 
                 _errorRepository.InsertError(error);
-
-                _errors.Add(error);
             }
-        }
-
-        private void SendErrors(object state)
-        {
-            lock (_errors)
-            {
-                _hub.Clients.All.Errors(_errors);
-                _errors.Clear();
-            }
-        }
-
-        public void Dispose()
-        {
-            _timer.Dispose();
         }
     }
 }

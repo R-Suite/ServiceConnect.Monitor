@@ -3,8 +3,9 @@ define(['backbone',
     'app/views/endpointDetails',
     'app/views/navigation',
     'app/collections/heartbeats',
+    'app/models/endpoint',
     'moment'
-], function(Backbone, EndpointsView, EndpointDetailsView, Navigation, HeartbeatCollection, moment) {
+], function(Backbone, EndpointsView, EndpointDetailsView, Navigation, HeartbeatCollection, EndpointModel, moment) {
 
     "use strict";
 
@@ -37,21 +38,31 @@ define(['backbone',
         endpointDetails: function(name, location) {
             var that = this;
             var collection = new HeartbeatCollection();
-            var model = new Backbone.Model({
-                Name: name,
-                Location: location,
-                From: moment.utc().subtract(1, "hours").format(),
-                To: moment.utc().format()
-            });
-            collection.fetch({
-                data: model.attributes,
-                success: function() {
-                    var view = new EndpointDetailsView({
-                        collection: collection,
-                        model: model
-                    });
-                    that.renderView(view);
+            var model = new EndpointModel();
+            var modelPromise = model.fetch({
+                data: {
+                    name: name,
+                    location: location
                 }
+            });
+            var collectionPromise = collection.fetch({
+                data: {
+                    name: name,
+                    location: location,
+                    from: moment.utc().subtract(1, "hours").format(),
+                    to: moment.utc().format()
+                }
+            });
+            $.when(modelPromise, collectionPromise).done(function() {
+                model.set({                    
+                    From: moment.utc().subtract(1, "hours").format(),
+                    To: moment.utc().format()
+                });
+                var view = new EndpointDetailsView({
+                    collection: collection,
+                    model: model
+                });
+                that.renderView(view);
             });
         }
     });

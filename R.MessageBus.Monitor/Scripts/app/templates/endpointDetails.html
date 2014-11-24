@@ -1,29 +1,28 @@
-<div class="content">
-    <h3><%= header %></h3>
-    <div class="row" style="padding-bottom: 10px; padding-top: 10px;">
-        <div class="col-md-1">
-            <label class="control-label" style="padding-top: 5px;">From: </label>
-        </div>
-        <div class="col-md-5">
-            <div datepicker="" class="input-group date" style="width: 100%">
-                <input class="form-control from" type="text" value="" style="width: 100%">
-                <span class="input-group-addon" style="width: 50px"><i class="glyphicon glyphicon-calendar"></i></span>
-            </div>
-        </div>
-        <div class="col-md-1">
-            <label class="control-label" style="padding-top: 5px;">To: </label>
-        </div>
-        <div class="col-md-5">
-            <div datepicker="" class="input-group date" style="width: 100%">
-                <input id="startDateTime" class="form-control to" type="text" value="" style="width: 100%">
-                <span class="input-group-addon" style="width: 50px"><i class="glyphicon glyphicon-calendar"></i></span>
-            </div>
+<h3 style="margin-top: 0px;"><%= header %></h3>
+<div class="row" style="padding-bottom: 10px; padding-top: 10px;">
+    <div class="col-md-1">
+        <label class="control-label" style="padding-top: 5px;">From: </label>
+    </div>
+    <div class="col-md-5">
+        <div datepicker="" class="input-group date" style="width: 100%">
+            <input class="form-control from" type="text" value="" style="width: 100%">
+            <span class="input-group-addon" style="width: 50px"><i class="glyphicon glyphicon-calendar"></i></span>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-12 serviceGraph"></div>
+    <div class="col-md-1">
+        <label class="control-label" style="padding-top: 5px;">To: </label>
     </div>
-    <div class="row">
-        <div class="col-sm-12 serviceTable"></div>
+    <div class="col-md-5">
+        <div datepicker="" class="input-group date" style="width: 100%">
+            <input id="startDateTime" class="form-control to" type="text" value="" style="width: 100%">
+            <span class="input-group-addon" style="width: 50px"><i class="glyphicon glyphicon-calendar"></i></span>
+        </div>
     </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 serviceGraph"></div>
+</div>
+<div class="row">
+    <div class="col-sm-6 serviceDetails well " style="height: 870px;"></div>
+    <div class="col-sm-6 serviceTable"></div>
 </div>

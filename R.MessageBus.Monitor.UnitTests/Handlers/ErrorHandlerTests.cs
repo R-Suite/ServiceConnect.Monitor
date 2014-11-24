@@ -16,11 +16,9 @@ namespace R.MessageBus.Monitor.UnitTests.Handlers
         private readonly Mock<IErrorRepository> _mockRepository;
         private readonly Dictionary<string, string> _headers;
         private readonly MessageException _messageException;
-        private Mock<IHubContext> _mockContext;
 
         public ErrorHandlerTests()
         {
-            _mockContext = new Mock<IHubContext>();
             _mockRepository = new Mock<IErrorRepository>();
             _mockRepository.Setup(x => x.InsertError(It.IsAny<Error>()));
 
@@ -57,7 +55,7 @@ namespace R.MessageBus.Monitor.UnitTests.Handlers
         public void ShouldInsertAuditMessageAndHeadersIntoRepository()
         {
             // Arrange
-            var handler = new ErrorMessageHandler(_mockRepository.Object, _mockContext.Object);
+            var handler = new ErrorMessageHandler(_mockRepository.Object);
 
             // Act
             handler.Execute("TestMessage", _headers);

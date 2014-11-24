@@ -32,6 +32,7 @@ namespace R.MessageBus.Monitor.DependencyResolution {
                 x.For<IServiceRepository>().Use<ServiceRepository>().Ctor<string>("mongoConnectionString").Is(WebConfigurationManager.AppSettings["MongoConnectionString"]);
                 x.For<IServiceMessageRepository>().Use<ServiceMessageRepository>().Ctor<string>("mongoConnectionString").Is(WebConfigurationManager.AppSettings["MongoConnectionString"]);
                 x.For<IHeartbeatRepository>().Use<HeartbeatRepository>().Ctor<string>("mongoConnectionString").Is(WebConfigurationManager.AppSettings["MongoConnectionString"]);
+                x.For<ITagRepository>().Use<TagRepository>().Ctor<string>("mongoConnectionString").Is(WebConfigurationManager.AppSettings["MongoConnectionString"]);
                 x.Scan(scan =>
                 {
                     scan.TheCallingAssembly();

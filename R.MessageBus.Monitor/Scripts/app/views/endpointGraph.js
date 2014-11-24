@@ -17,13 +17,15 @@ define(['backbone',
 
         render: function() {
             this.$el.html(template);
-            this._buidGraphModel();
             this._renderGraph();
             return this;
         },
 
-        _buidGraphModel: function() {
+        refresh: function () {
+            this._renderGraph();
+        },
 
+        _buidGraphModel: function() {
             var edges = [];
             this.serviceMessagesCollection.each(function(model) {
                 edges.push({
@@ -51,6 +53,7 @@ define(['backbone',
         },
 
         _renderGraph: function() {
+            this._buidGraphModel();
             var container = document.getElementById('serviceGraph');
             var data = {
                 nodes: this.nodes,
