@@ -10,18 +10,18 @@
 
 /// <reference path="..\..\SignalR.Client.JS\Scripts\jquery-1.6.4.js" />
 /// <reference path="jquery.signalR.js" />
-(function ($, window, undefined) {
+(function($, window, undefined) {
     /// <param name="$" type="jQuery" />
     "use strict";
 
-    if (typeof ($.signalR) !== "function") {
+    if (typeof($.signalR) !== "function") {
         throw new Error("SignalR: SignalR is not loaded. Please ensure jquery.signalR-x.js is referenced before ~/signalr/js.");
     }
 
     var signalR = $.signalR;
 
     function makeProxyCallback(hub, callback) {
-        return function () {
+        return function() {
             // Call the client hub method
             callback.apply(hub, $.makeArray(arguments));
         };
@@ -64,39 +64,38 @@
         }
     }
 
-    $.hubConnection.prototype.createHubProxies = function () {
+    $.hubConnection.prototype.createHubProxies = function() {
         var proxies = {};
-        this.starting(function () {
+        this.starting(function() {
             // Register the hub proxies as subscribed
             // (instance, shouldSubscribe)
             registerHubProxies(proxies, true);
 
             this._registerSubscribedHubs();
-        }).disconnected(function () {
+        }).disconnected(function() {
             // Unsubscribe all hub proxies when we "disconnect".  This is to ensure that we do not re-add functional call backs.
             // (instance, shouldSubscribe)
             registerHubProxies(proxies, false);
         });
 
-        proxies['auditHub'] = this.createHubProxy('auditHub');
-        proxies['auditHub'].client = {};
-        proxies['auditHub'].server = {
-        };
+        proxies.auditHub = this.createHubProxy('auditHub');
+        proxies.auditHub.client = {};
+        proxies.auditHub.server = {};
 
-        proxies['errorHub'] = this.createHubProxy('errorHub');
-        proxies['errorHub'].client = {};
-        proxies['errorHub'].server = {
-        };
+        proxies.errorHub = this.createHubProxy('errorHub');
+        proxies.errorHub.client = {};
+        proxies.errorHub.server = {};
 
-        proxies['heartbeatHub'] = this.createHubProxy('heartbeatHub');
-        proxies['heartbeatHub'].client = {};
-        proxies['heartbeatHub'].server = {
-        };
+        proxies.heartbeatHub = this.createHubProxy('heartbeatHub');
+        proxies.heartbeatHub.client = {};
+        proxies.heartbeatHub.server = {};
 
         return proxies;
     };
 
-    signalR.hub = $.hubConnection("/signalr", { useDefaultPath: false });
+    signalR.hub = $.hubConnection("/signalr", {
+        useDefaultPath: false
+    });
     $.extend(signalR, signalR.hub.createHubProxies());
 
 }(window.jQuery, window));

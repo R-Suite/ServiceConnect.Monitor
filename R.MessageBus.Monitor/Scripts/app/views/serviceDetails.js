@@ -6,7 +6,7 @@ define(['backbone',
     'app/collections/messageTypes',
     'toastr',
     'select2'
-], function (Backbone, _, $, template, Backgrid, MessageTypeCollection, toastr) {
+], function(Backbone, _, $, template, Backgrid, MessageTypeCollection, toastr) {
 
     "use strict";
 
@@ -23,7 +23,7 @@ define(['backbone',
             headerClassName: "hidden",
             editable: false
         }],
-        
+
         bindings: {
             ".name": "Name",
             ".location": "InstanceLocation",
@@ -87,10 +87,10 @@ define(['backbone',
             var that = this;
             this.$el.find(".tags").select2({
                 multiple: true,
-                createSearchChoice: function (term, data) {
-                    if ($(data).filter(function () {
-                        return this.text.localeCompare(term) === 0;
-                    }).length === 0) {
+                createSearchChoice: function(term, data) {
+                    if ($(data).filter(function() {
+                            return this.text.localeCompare(term) === 0;
+                        }).length === 0) {
                         return {
                             id: term,
                             text: term
@@ -98,13 +98,13 @@ define(['backbone',
                     }
                 },
                 allowClear: true,
-                query: function (query) {
+                query: function(query) {
                     $.ajax({
                         url: "/tags",
                         data: {
                             query: query.term
                         },
-                        success: function (data) {
+                        success: function(data) {
                             var results = [];
                             for (var i = 0; i < data.length; i++) {
                                 results.push({
@@ -118,7 +118,7 @@ define(['backbone',
                         }
                     });
                 },
-                initSelection: function (element, callback) {
+                initSelection: function(element, callback) {
                     if (!that.model.get("Tags")) {
                         that.model.set("Tags", []);
                         return;
@@ -133,22 +133,22 @@ define(['backbone',
                     }
                     callback(data);
                 }
-            }).on("select2-selecting", function (e, d) {
+            }).on("select2-selecting", function(e, d) {
                 that.model.get("Tags").push(e.object.id);
-            }).on("select2-removed", function (e, d) {
+            }).on("select2-removed", function(e, d) {
                 var index;
-                $.each(that.model.get("Tags"), function (i, tag) {
+                $.each(that.model.get("Tags"), function(i, tag) {
                     if (tag === e.val) {
                         index = i;
                     }
                 });
                 that.model.get("Tags").splice(index, 1);
             }).select2('val', []);
-            
+
             return this;
         },
 
-        _saveDetails: function (e) {
+        _saveDetails: function(e) {
             e.preventDefault();
             this.model.save(null, {
                 success: function() {
@@ -156,7 +156,7 @@ define(['backbone',
                 }
             });
         },
-        
+
         onClose: function() {
             this.unstickit();
         }

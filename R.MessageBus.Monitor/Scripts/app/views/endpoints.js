@@ -19,6 +19,7 @@ define(['backbone',
 
         initialize: function() {
             _.bindAll(this);
+            this.tags = [];
         },
 
         render: function() {
@@ -33,18 +34,18 @@ define(['backbone',
             var promise1 = this.endpointCollection.fetch();
             var promise2 = this.serviceMessagesCollection.fetch();
             $.when(promise1, promise2).done(this._renderEndpointGraph);
-            
+
             var that = this;
             this.$el.find(".tags").select2({
                 multiple: true,
                 allowClear: true,
-                query: function (query) {
+                query: function(query) {
                     $.ajax({
                         url: "/tags",
                         data: {
                             query: query.term
                         },
-                        success: function (data) {
+                        success: function(data) {
                             var results = [];
                             for (var i = 0; i < data.length; i++) {
                                 results.push({
@@ -58,26 +59,26 @@ define(['backbone',
                         }
                     });
                 }
-            }).on("select2-selecting", function (e, d) {
+            }).on("select2-selecting", function(e, d) {
                 that.tags.push(e.object.id);
                 that._filterServices();
-            }).on("select2-removed", function (e, d) {
+            }).on("select2-removed", function(e, d) {
                 var index;
-                $.each(that.tags, function (i, tag) {
+                $.each(that.tags, function(i, tag) {
                     if (tag === e.val) {
                         index = i;
                     }
                 });
                 that.tags.splice(index, 1);
                 that._filterServices();
-            }).select2('val', []);
+            });
 
             this.timer = new Timer(this._refresh, 5000);
             this.timer.start();
             return this;
         },
-        
-        _filterServices: function () {
+
+        _filterServices: function() {
             var promise1 = this.endpointCollection.fetch({
                 data: {
                     tags: this.tags
@@ -94,6 +95,9 @@ define(['backbone',
         },
 
         _renderServices: function() {
+            if (this.services) {
+                this.services.close();
+            }
             this.services = new ServicesView({
                 collection: this.serviceCollection
             });
@@ -103,13 +107,13 @@ define(['backbone',
 
         _renderEndpointGraph: function() {
             this.endpointGraph = new EndpointGraphView({
-                endpointCollection: this.endpointCollection.fullCollection,
+                endpointCollection: this.endpointCollection,
                 serviceMessagesCollection: this.serviceMessagesCollection
             });
             this.$el.find(".endpointGraph").html(this.endpointGraph.$el);
             this.renderView(this.endpointGraph);
         },
-        
+
         _refresh: function() {
             this.serviceCollection.fetch({
                 data: {
@@ -118,7 +122,7 @@ define(['backbone',
                 reset: true
             });
         },
-        
+
         onClose: function() {
             this.timer.stop();
         }

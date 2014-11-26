@@ -9,12 +9,13 @@
         "bower_components/backgrid-paginator/backgrid-paginator.css",
         "bower_components/fontawesome/css/font-awesome.css",
         "app/css/select2-bootstrap.css",
-        "app/css/bootstrap.css",
         "bower_components/vis/dist/vis.min.css",
-        "app/css/style.css",
         "bower_components/backgrid-moment-cell/backgrid-moment-cell.css",
         "app/css/bootstrap-datetimepicker.min.css",
-        "bower_components/c3/c3.css"
+        "bower_components/slickgrid/slick.grid.css",
+        "app/css/slick-default-theme.css",
+        "app/css/bootstrap.css",
+        "app/css/style.css"
     ];
 
     require("matchdep").filterDev("grunt-*").forEach(grunt.loadNpmTasks);

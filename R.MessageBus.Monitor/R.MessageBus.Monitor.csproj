@@ -43,7 +43,27 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.1.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.1.2\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.1.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.1.2\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin, Version=2.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.2.0.2\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=2.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.2.0.2\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=2.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Owin.Security.2.0.2\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
@@ -56,6 +76,10 @@
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="RabbitMQ.Client, Version=3.2.4.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -154,6 +178,7 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\StructuremapMvc.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Consumer.cs" />
@@ -174,6 +199,9 @@
     <Compile Include="Handlers\AuditMessageHandler.cs" />
     <Compile Include="Handlers\HearbeatMessageHandler.cs" />
     <Compile Include="Handlers\ErrorMessageHandler.cs" />
+    <Compile Include="Hubs\AuditHub.cs" />
+    <Compile Include="Hubs\ErrorHub.cs" />
+    <Compile Include="Hubs\HeartbeatHub.cs" />
     <Compile Include="Interfaces\ITagRepository.cs" />
     <Compile Include="Interfaces\IHeartbeatRepository.cs" />
     <Compile Include="Interfaces\IErrorRepository.cs" />
@@ -200,14 +228,15 @@
   <ItemGroup>
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\app\collections\auditMessages.js" />
     <Content Include="Scripts\app\collections\services.js" />
     <Content Include="Scripts\app\collections\messageTypes.js" />
     <Content Include="Scripts\app\collections\heartbeats.js" />
     <Content Include="Scripts\app\collections\endpoints.js" />
     <Content Include="Scripts\app\collections\serviceMessages.js" />
-    <Content Include="Scripts\app\css\services.js" />
     <Content Include="Scripts\app\css\bootstrap-datetimepicker.min.css" />
     <Content Include="Scripts\app\css\bootstrap.css" />
+    <Content Include="Scripts\app\css\slick-default-theme.css" />
     <Content Include="Scripts\app\css\style.css" />
     <Content Include="Scripts\app\css\select2-bootstrap.css" />
     <Content Include="Scripts\app\helpers\backbone.extensions.js" />
@@ -215,18 +244,24 @@
     <Content Include="Scripts\app\helpers\timer.js" />
     <Content Include="Scripts\app\helpers\underscore.extensions.js" />
     <Content Include="Scripts\app\lib\bootstrap-datetimepicker.js" />
+    <Content Include="Scripts\app\lib\jquery.event.drag-2.2.js" />
     <Content Include="Scripts\app\models\endpoint.js" />
     <Content Include="Scripts\app\routers\main.js" />
+    <Content Include="Scripts\app\templates\auditMessages.html" />
+    <Content Include="Scripts\app\templates\auditHistogram.html" />
+    <Content Include="Scripts\app\templates\auditTable.html" />
     <Content Include="Scripts\app\templates\serviceDetails.html" />
     <Content Include="Scripts\app\templates\serviceGraph.html" />
     <Content Include="Scripts\app\templates\serviceTable.html" />
     <Content Include="Scripts\app\lib\signalr.hubs.js" />
-    <Content Include="Scripts\app\routers\main.js" />
     <Content Include="Scripts\app\templates\endpointDetails.html" />
     <Content Include="Scripts\app\templates\navigation.html" />
     <Content Include="Scripts\app\templates\services.html" />
     <Content Include="Scripts\app\templates\endpointGraph.html" />
     <Content Include="Scripts\app\templates\endpoints.html" />
+    <Content Include="Scripts\app\views\auditMessages.js" />
+    <Content Include="Scripts\app\views\auditTable.js" />
+    <Content Include="Scripts\app\views\auditHistogram.js" />
     <Content Include="Scripts\app\views\serviceDetails.js" />
     <Content Include="Scripts\app\views\serviceTable.js" />
     <Content Include="Scripts\app\views\serviceGraph.js" />

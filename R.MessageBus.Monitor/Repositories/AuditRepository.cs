@@ -1,5 +1,9 @@
-﻿using MongoDB.Driver;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MongoDB.Driver;
 using MongoDB.Driver.Builders;
+using MongoDB.Driver.Linq;
 using R.MessageBus.Monitor.Interfaces;
 using R.MessageBus.Monitor.Models;
 
@@ -55,6 +59,15 @@ namespace R.MessageBus.Monitor.Repositories
                                        Set(x => x.LastSent, model.TimeReceived).
                                        Set(x => x.Type, model.TypeName),
                 UpdateFlags.Upsert);
+        }
+
+        public IList<Audit> Find(DateTime @from, DateTime to)
+        {
+            var result = _auditCollection.AsQueryable().Where(x =>
+               x.TimeSent >= from &&
+               x.TimeSent <= to).OrderByDescending(x => x.TimeSent);
+
+            return result.ToList();
         }
     }
 }

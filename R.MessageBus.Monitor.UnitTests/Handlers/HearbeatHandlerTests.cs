@@ -15,11 +15,14 @@ namespace R.MessageBus.Monitor.UnitTests.Handlers
         private readonly Mock<IHeartbeatRepository> _mockRepository;
         private readonly Dictionary<string, string> _headers;
         private readonly Heartbeat _message;
+        private Mock<IHubContext> _mockContext;
 
         public HearbeatHandlerTests()
         {
             _mockRepository = new Mock<IHeartbeatRepository>();
             _mockRepository.Setup(x => x.InsertHeartbeat(It.IsAny<Heartbeat>()));
+            _mockContext = new Mock<IHubContext>();
+
             _headers = new Dictionary<string, string>();
             _message = new Heartbeat
             {
@@ -37,7 +40,7 @@ namespace R.MessageBus.Monitor.UnitTests.Handlers
         public void ShouldInsertAuditMessageAndHeadersIntoRepository()
         {
             // Arrange
-            var handler = new HearbeatMessageHandler(_mockRepository.Object);
+            var handler = new HearbeatMessageHandler(_mockRepository.Object, _mockContext.Object);
 
             // Act
             handler.Execute(JsonConvert.SerializeObject(_message), _headers);

@@ -23,7 +23,7 @@ namespace R.MessageBus.AcceptanceTests
 
         public AuditMessagesSteps()
         {
-            var mongoClient = new MongoClient("mongodb://lonappdev04/");
+            var mongoClient = new MongoClient("mongodb://localhost:37017/");
             MongoServer server = mongoClient.GetServer();
             var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
             _auditCollection = mongoDatabase.GetCollection<Audit>("Audit");
@@ -35,7 +35,7 @@ namespace R.MessageBus.AcceptanceTests
 
             _bus = Bus.Initialize(config =>
             {
-                config.TransportSettings.Host = "lonappdev04";
+                config.TransportSettings.Host = "localhost";
                 config.SetAuditingEnabled(true);
                 config.SetQueueName("R.MessageBus.Monitor.AcceptanceTests");
                 config.AddQueueMapping(typeof(TestMessage), "R.MessageBus.Monitor.AcceptanceTests");

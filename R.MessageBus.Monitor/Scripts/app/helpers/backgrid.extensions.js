@@ -13,7 +13,7 @@ define(['backbone', 'underscore', 'backgrid'], function(Backbone, _, Backgrid) {
     };
 
     Backgrid.headerCell_initialize_original = Backgrid.HeaderCell.prototype.initialize;
-    Backgrid.HeaderCell.prototype.initialize = function () {
+    Backgrid.HeaderCell.prototype.initialize = function() {
         Backgrid.headerCell_initialize_original.apply(this, arguments);
         var className = this.column.get('headerClassName');
         if (className) this.$el.addClass(className);
