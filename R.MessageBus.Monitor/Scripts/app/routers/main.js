@@ -1,11 +1,12 @@
 define(['backbone',
     'app/views/endpoints',
+    'app/views/auditMessages',
     'app/views/endpointDetails',
     'app/views/navigation',
     'app/collections/heartbeats',
     'app/models/endpoint',
     'moment'
-], function(Backbone, EndpointsView, EndpointDetailsView, Navigation, HeartbeatCollection, EndpointModel, moment) {
+], function(Backbone, EndpointsView, AuditsView, EndpointDetailsView, Navigation, HeartbeatCollection, EndpointModel, moment) {
 
     "use strict";
 
@@ -14,7 +15,8 @@ define(['backbone',
         routes: {
             "": "endpoints",
             "endpoints(/)": "endpoints",
-            "endpoint/:name/:location": "endpointDetails"
+            "endpoint/:name/:location": "endpointDetails",
+            "audit(/)": "audits"
         },
 
         before: function(route) {
@@ -32,6 +34,11 @@ define(['backbone',
 
         endpoints: function() {
             var view = new EndpointsView();
+            this.renderView(view);
+        },
+
+        audits: function() {
+            var view = new AuditsView();
             this.renderView(view);
         },
 
@@ -54,7 +61,7 @@ define(['backbone',
                 }
             });
             $.when(modelPromise, collectionPromise).done(function() {
-                model.set({                    
+                model.set({
                     From: moment.utc().subtract(1, "hours").format(),
                     To: moment.utc().format()
                 });

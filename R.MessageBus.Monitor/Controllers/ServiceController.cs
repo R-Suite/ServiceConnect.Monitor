@@ -83,7 +83,7 @@ namespace R.MessageBus.Monitor.Controllers
                 InstanceLocation = string.Join(", ", x.Select(y => y.InstanceLocation)),
                 ConsumerType = x.First().ConsumerType,
                 Language = x.First().Language,
-                Tags = x.SelectMany(y => y.Tags).Distinct().ToList()
+                Tags = x.Where(y => y.Tags != null).SelectMany(y => y.Tags).Distinct().ToList()
             }).Where(x => tags == null || tags.Any(y => x.Tags.Contains(y))).OrderBy(x => x.Name).ToList();
         }
 

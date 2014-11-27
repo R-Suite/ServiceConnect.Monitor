@@ -20,6 +20,7 @@ namespace R.MessageBus.Monitor.UnitTests.Handlers
         {
             _mockRepository = new Mock<IAuditRepository>();
             _mockRepository.Setup(x => x.InsertAudit(It.IsAny<Audit>()));
+            _mockContext = new Mock<IHubContext>();
 
             _headers = new Dictionary<string, string>
             {
@@ -43,7 +44,7 @@ namespace R.MessageBus.Monitor.UnitTests.Handlers
         public void ShouldInsertAuditMessageAndHeadersIntoRepository()
         {
             // Arrange
-            var handler = new AuditMessageHandler(_mockRepository.Object);
+            var handler = new AuditMessageHandler(_mockRepository.Object, _mockContext.Object);
 
             // Act
             handler.Execute("TestMessage", _headers);

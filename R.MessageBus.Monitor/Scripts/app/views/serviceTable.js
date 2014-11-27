@@ -63,7 +63,7 @@ define(['backbone',
             this.$el.find(".backgrid").addClass("table-hover");
             this.$el.find(".backgrid").addClass("table-bordered");
         },
-        
+
         refresh: function() {
             this.grid.remove();
             this._renderGrid();

@@ -15,16 +15,36 @@
         'moment': "bower_components/moment/moment",
         "vis": "bower_components/vis/dist/vis",
         "datetimepicker": "app/lib/bootstrap-datetimepicker",
-        "d3": "bower_components/d3/d3",
-        "c3": "bower_components/c3/c3"
+        "highchartsMain": "bower_components/highcharts/highcharts",
+        "highcharts": "bower_components/highcharts/themes/grid-light",
+        'signalr.hubs': "app/lib/signalr.hubs",
+        "signalr": "bower_components/signalr/jquery.signalR",
+        "slickgrid": "bower_components/slickgrid/slick.grid",
+        "jquery.event.drag": "app/lib/jquery.event.drag-2.2",
+        "slick.core": "bower_components/slickgrid/slick.core"
     },
     shim: {
-        "d3": {
-            exports: "d3"
+        "slick.core": {
+            "deps": [ "jquery" ]
         },
-        "c3": {
-            deps: ["d3"],
-            exports: "c3"
+        "jquery.event.drag": {
+            "deps": ["jquery"]    
+        },
+        "slickgrid": {
+            "deps": [
+                "jquery",
+                "jquery.event.drag",
+                "slick.core"
+            ],
+            "exports": "Slick"
+        },
+        "highchartsMain": {
+            "exports": "Highcharts",
+            "deps": ["jquery"]
+        },
+        "highcharts": {
+            "exports": "Highcharts",
+            "deps": ["jquery", "highchartsMain"]
         },
         'backbone-pageable': {
             deps: ["backbone", "underscore", "jquery"]
@@ -58,6 +78,13 @@
         },
         'backbone.stickit': {
             deps: ["backbone", "underscore", "jquery"]
+        },
+        'signalr': {
+            deps: ["jquery"],
+            exports: '$'
+        },
+        "signalr.hubs": {
+            deps: ["signalr"]
         }
     },
     waitSeconds: 200
@@ -74,10 +101,24 @@ require(['backbone',
          'app/helpers/backgrid.extensions',
          "vis",
          "datetimepicker",
-         "backbone.stickit"],
+         "backbone.stickit",
+         "highcharts",
+         'signalr',
+         "signalr.hubs",
+         "slickgrid"],
 function (Backbone, $, toastr, Router) {
     Backbone.Application = {};
     Backbone.Application.Router = new Router();
+
+    Backbone.Hubs = {
+        AuditHub: $.connection.auditHub,
+        ErrorHub: $.connection.errorHub,
+        HeartbeatHub: $.connection.heartbeatHub
+    };
+    
+    Backbone.Hubs.AuditHub.client.init = function () { };
+    Backbone.Hubs.ErrorHub.client.init = function () { };
+    Backbone.Hubs.HeartbeatHub.client.init = function () { };
 
     toastr.options = {
         "closeButton": false,
@@ -93,5 +134,7 @@ function (Backbone, $, toastr, Router) {
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
     };
-    Backbone.history.start();
+    $.connection.hub.start().done(function () {
+        Backbone.history.start();
+    });
 });

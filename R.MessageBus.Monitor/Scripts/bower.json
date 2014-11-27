@@ -16,7 +16,12 @@
     "test",
     "tests"
   ],
-  "dependencies": {
+  "resolutions": {
+    "underscore": "1.5.0",
+    "jquery": "1.11.0"
+  },
+  "devDependencies": {
+    "signalr": "~2.1.2",
     "backbone": "~1.1.2",
     "underscore": "1.5.0",
     "jquery": "1.11.0",
@@ -37,8 +42,8 @@
     "vis": "~3.6.4",
     "highcharts": "~4.0.4"
   },
-  "resolutions": {
-    "underscore": "1.5.0",
-    "jquery": "1.11.0"
+  "dependencies": {
+    "jqgrid": "~4.6.0",
+    "slickgrid": "~2.1.0"
   }
 }

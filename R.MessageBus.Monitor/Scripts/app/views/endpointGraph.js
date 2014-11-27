@@ -21,7 +21,7 @@ define(['backbone',
             return this;
         },
 
-        refresh: function () {
+        refresh: function() {
             this._renderGraph();
         },
 
@@ -38,7 +38,7 @@ define(['backbone',
             var nodes = [];
             this.endpointCollection.each(function(model) {
                 var edgeExists = _.find(edges, function(edge) {
-                    return (edge.from === model.get("Name") || edge.to === model.get("Name")) && edge.to != edge.from;
+                    return edge.from === model.get("Name") || edge.to === model.get("Name");
                 });
                 if (edgeExists) {
                     nodes.push({

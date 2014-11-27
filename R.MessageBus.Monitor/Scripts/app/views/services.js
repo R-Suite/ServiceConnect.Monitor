@@ -88,10 +88,6 @@ define(['backbone',
             });
             this.$el.find(".serviceGrid").html(this.grid.render().$el);
 
-            var paginator = new Backgrid.Extension.Paginator({
-                collection: this.collection
-            });
-            this.$el.find(".servicePaginator").html(paginator.render().$el);
 
             this.$el.find(".backgrid").addClass("table-hover");
             this.$el.find(".backgrid").addClass("table-bordered");
