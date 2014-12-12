@@ -59,7 +59,7 @@ define(['backbone',
                 name: "",
                 width: 40,
                 formatter: function(row, col, val, colDefinition, model) {
-                    return "<a href='#route/" + val + "' >Route</a>";
+                    return "<a href='#route/" + val + "' >Session</a>";
                 }
             }, {
                 id: "Id",
