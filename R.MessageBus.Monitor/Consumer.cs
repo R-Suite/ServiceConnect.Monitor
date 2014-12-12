@@ -19,6 +19,8 @@ namespace R.MessageBus.Monitor
         private IModel _model;
         private ConsumerEventHandler _consumerEventHandler;
         private string _queueName;
+        private bool _connectionClosed;
+        private string _forwardQueue;
 
         public Consumer(string host, string username, string password)
         {
@@ -47,13 +49,20 @@ namespace R.MessageBus.Monitor
             string message = Encoding.UTF8.GetString(args.Body);
 
             _consumerEventHandler(message, headers);
+
+            if (!string.IsNullOrEmpty(_forwardQueue))
+            {
+                _model.BasicPublish(string.Empty, _forwardQueue, args.BasicProperties, args.Body);
+            }
+
             _model.BasicAck(args.DeliveryTag, false);
         }
 
-        public void StartConsuming(ConsumerEventHandler messageReceived, string queueName)
+        public void StartConsuming(ConsumerEventHandler messageReceived, string queueName, string forwardQueue)
         {
             _consumerEventHandler = messageReceived;
             _queueName = queueName;
+            _forwardQueue = forwardQueue;
             CreateConsumer();
         }
 
@@ -83,40 +92,49 @@ namespace R.MessageBus.Monitor
 
             _model = _connection.CreateModel();
 
-            var queueName = ConfigureQueue();
+            var queueName = ConfigureQueue(_queueName);
+
+            if (_forwardQueue != null)
+            {
+                ConfigureQueue(_forwardQueue);
+            }
+
             var consumer = new EventingBasicConsumer();
             consumer.Received += Event;
+            consumer.Shutdown += ConsumerShutdown;
             _model.BasicConsume(queueName, false, consumer);
-
-            string exchange = ConfigureExchange("TestExchange");
-            _model.QueueBind(queueName, exchange, string.Empty);
         }
 
-        private string ConfigureExchange(string exchangeName)
+        public void SetForwardQueue(string queue)
+        {
+            _forwardQueue = queue;
+            if (_forwardQueue != null)
+            {
+                ConfigureQueue(_forwardQueue);
+            }
+        }
+
+        private void ConsumerShutdown(object sender, ShutdownEventArgs e)
+        {
+            if (_connectionClosed)
+            {
+                return;
+            }
+
+            Retry.Do(CreateConsumer, ex => Logger.Error("Error connecting to queue - {0}", ex), new TimeSpan(0, 0, 0, 10));
+        }
+
+        private string ConfigureQueue(string queue)
         {
             try
             {
-                _model.ExchangeDeclare(exchangeName, "fanout", true, true, null);
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn(string.Format("Error declaring exchange {0}", ex.Message));
-            }
-
-            return exchangeName;
-        }
-
-        private string ConfigureQueue()
-        {
-            try
-            {
-                _model.QueueDeclare(_queueName, true, false, false, null);
+                _model.QueueDeclare(queue, true, false, false, null);
             }
             catch (Exception ex)
             {
                 Logger.Warn(string.Format("Error declaring queue - {0}", ex.Message));
             }
-            return _queueName;
+            return queue;
         }
 
         public void StopConsuming()
@@ -128,6 +146,7 @@ namespace R.MessageBus.Monitor
         {
             if (_connection != null)
             {
+                _connectionClosed = true;
                 _connection.Close(500);
             }
             if (_model != null)

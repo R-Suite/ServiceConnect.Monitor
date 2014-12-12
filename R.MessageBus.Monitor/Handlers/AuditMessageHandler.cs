@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using Microsoft.AspNet.SignalR;
+using Newtonsoft.Json;
 using R.MessageBus.Monitor.Interfaces;
 using R.MessageBus.Monitor.Models;
 
@@ -43,7 +44,8 @@ namespace R.MessageBus.Monitor.Handlers
                     TimeProcessed = DateTime.ParseExact(headers["TimeProcessed"], "O", CultureInfo.InvariantCulture),
                     TimeReceived = DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture),
                     TimeSent = DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture),
-                    Language = headers["Language"]
+                    Language = headers["Language"],
+                    CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId
                 };
 
                 _auditRepository.InsertAudit(audit);

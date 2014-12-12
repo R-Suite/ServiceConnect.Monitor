@@ -23,7 +23,7 @@ namespace R.MessageBus.AcceptanceTests
 
         public AuditMessagesSteps()
         {
-            var mongoClient = new MongoClient("mongodb://localhost:37017/");
+            var mongoClient = new MongoClient("mongodb://lonappdev04");
             MongoServer server = mongoClient.GetServer();
             var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
             _auditCollection = mongoDatabase.GetCollection<Audit>("Audit");

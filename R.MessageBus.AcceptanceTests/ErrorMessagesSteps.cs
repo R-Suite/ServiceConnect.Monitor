@@ -20,7 +20,7 @@ namespace R.MessageBus.AcceptanceTests
 
         public ErrorMessagesSteps()
         {
-            var mongoClient = new MongoClient("mongodb://localhost:37017/");
+            var mongoClient = new MongoClient("mongodb://lonappdev04/");
             MongoServer server = mongoClient.GetServer();
             var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
             _errorCollection = mongoDatabase.GetCollection<Error>("Errors");

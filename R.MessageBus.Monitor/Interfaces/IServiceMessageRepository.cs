@@ -6,5 +6,6 @@ namespace R.MessageBus.Monitor.Interfaces
     public interface IServiceMessageRepository
     {
         IList<ServiceMessage> Find();
+        void EnsureIndex();
     }
 }

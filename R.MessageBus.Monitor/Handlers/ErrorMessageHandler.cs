@@ -45,7 +45,8 @@ namespace R.MessageBus.Monitor.Handlers
                     TimeReceived = DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture),
                     TimeSent = DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture),
                     Exception = JsonConvert.DeserializeObject<MessageException>(headers["Exception"]),
-                    Language = headers["Language"]
+                    Language = headers["Language"],
+                    CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId
                 };
 
                 _errorRepository.InsertError(error);

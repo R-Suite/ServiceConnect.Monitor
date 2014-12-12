@@ -149,12 +149,16 @@ define(['backbone',
         },
 
         _addHeartbeats: function(heartbeats) {
+            var myHeartbeats = [];
             for (var i = 0; i < heartbeats.length; i++) {
-                this.collection.add(new Backbone.Model(heartbeats[i]), {
-                    at: 0
-                });
+                if (heartbeats[i].Name === this.model.get("Name") && heartbeats[i].Location === this.model.get("InstanceLocation")) {
+                    this.collection.add(new Backbone.Model(heartbeats[i]), {
+                        at: 0
+                    });
+                    myHeartbeats.push(heartbeats[i]);
+                }
             }
-            this.serviceGraph.addHeartbeats(heartbeats);
+            this.serviceGraph.addHeartbeats(myHeartbeats);
         },
 
         onClose: function() {

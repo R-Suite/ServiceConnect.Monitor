@@ -70,7 +70,7 @@
         },
 
         jshint: {
-            files: ['app/**/*.js']
+            files: ['app/**/*.js', '!app/lib/**/*.js']
         },
 
         sloc: {
@@ -92,6 +92,6 @@
 
     grunt.registerTask('server', ['connect', 'watch']);
     grunt.registerTask('test', ['connect', 'exec', 'watch']);
-    grunt.registerTask('default', ['cssmin', 'jsbeautifier', 'jshint', 'exec', 'watch']);
+    grunt.registerTask('default', ['cssmin', 'jsbeautifier', 'jshint']);
     grunt.registerTask('dist', ['jsbeautifier', 'jshint', 'cssmin', 'requirejs', 'sloc']);
 };

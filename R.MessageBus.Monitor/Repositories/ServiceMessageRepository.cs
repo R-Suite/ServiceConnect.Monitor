@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Driver;
+using MongoDB.Driver.Builders;
 using MongoDB.Driver.Linq;
 using R.MessageBus.Monitor.Interfaces;
 using R.MessageBus.Monitor.Models;
@@ -22,6 +23,11 @@ namespace R.MessageBus.Monitor.Repositories
         public IList<ServiceMessage> Find()
         {
             return _serviceMessagesCollection.AsQueryable().ToList();
+        }
+
+        public void EnsureIndex()
+        {
+            _serviceMessagesCollection.CreateIndex(IndexKeys<ServiceMessage>.Ascending(x => x.In).Ascending(x => x.Out));
         }
     }
 }

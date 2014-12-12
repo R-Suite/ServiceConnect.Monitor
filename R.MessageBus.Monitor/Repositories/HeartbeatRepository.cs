@@ -50,5 +50,26 @@ namespace R.MessageBus.Monitor.Repositories
 
             return result.ToList();
         }
+
+        public void Remove(string name, string location)
+        {
+            _heartbeatsCollection.Remove(
+                Query.And(
+                    Query<Heartbeat>.EQ(x => x.Name, name),
+                    Query<Heartbeat>.EQ(x => x.Location, location)
+                )
+            );
+        }
+
+        public void EnsureIndex()
+        {
+            _heartbeatsCollection.CreateIndex(IndexKeys<Heartbeat>.Ascending(x => x.Name).Ascending(x => x.Location).Descending(x => x.Timestamp));
+            _heartbeatsCollection.CreateIndex(IndexKeys<Heartbeat>.Ascending(x => x.Name).Ascending(x => x.Location));
+        }
+
+        public void Remove(DateTime before)
+        {
+            _heartbeatsCollection.Remove(Query<Heartbeat>.LT(x => x.Timestamp, before));
+        }
     }
 }

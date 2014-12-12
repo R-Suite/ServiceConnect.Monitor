@@ -44,6 +44,8 @@
   },
   "dependencies": {
     "jqgrid": "~4.6.0",
-    "slickgrid": "~2.1.0"
+    "slickgrid": "~2.1.0",
+    "jqrangeslider": "~5.7.0",
+    "jquery-ui": "~1.11.2"
   }
 }

@@ -21,9 +21,13 @@
         "signalr": "bower_components/signalr/jquery.signalR",
         "slickgrid": "bower_components/slickgrid/slick.grid",
         "jquery.event.drag": "app/lib/jquery.event.drag-2.2",
-        "slick.core": "bower_components/slickgrid/slick.core"
+        "slick.core": "bower_components/slickgrid/slick.core",
+        "highcharts-histogram": "app/lib/highcharts-histogram"
     },
     shim: {
+        "highcharts-histogram": {
+            "deps": [ "highcharts" ]    
+        },
         "slick.core": {
             "deps": [ "jquery" ]
         },
@@ -87,6 +91,7 @@
             deps: ["signalr"]
         }
     },
+    wrapShim: true,
     waitSeconds: 200
 });
 
@@ -94,6 +99,7 @@ require(['backbone',
          'jquery',
          'toastr',
          'app/routers/main',
+         "highcharts",
          'bootstrap',
          'backgrid-paginator',
          'app/helpers/backbone.extensions',
@@ -102,11 +108,11 @@ require(['backbone',
          "vis",
          "datetimepicker",
          "backbone.stickit",
-         "highcharts",
          'signalr',
          "signalr.hubs",
-         "slickgrid"],
-function (Backbone, $, toastr, Router) {
+         "slickgrid",
+         "highcharts-histogram"],
+function (Backbone, $, toastr, Router, Highcharts) {
     Backbone.Application = {};
     Backbone.Application.Router = new Router();
 
@@ -119,6 +125,17 @@ function (Backbone, $, toastr, Router) {
     Backbone.Hubs.AuditHub.client.init = function () { };
     Backbone.Hubs.ErrorHub.client.init = function () { };
     Backbone.Hubs.HeartbeatHub.client.init = function () { };
+    
+    Highcharts.setOptions({
+        plotOptions: {
+            series: {
+                animation: false
+            }
+        },
+        credits: {
+            enabled: false
+        }
+    });
 
     toastr.options = {
         "closeButton": false,

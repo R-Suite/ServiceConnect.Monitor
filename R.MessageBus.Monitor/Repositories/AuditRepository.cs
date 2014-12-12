@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using MongoDB.Driver.Linq;
@@ -23,6 +24,27 @@ namespace R.MessageBus.Monitor.Repositories
             _auditCollection = mongoDatabase.GetCollection<Audit>("Audit");
             _serviceCollection = mongoDatabase.GetCollection<Service>("Services");
             _serviceMessagesCollection = mongoDatabase.GetCollection<ServiceMessage>("ServiceMessages");
+        }
+
+        public void EnsureIndex()
+        {
+            _auditCollection.CreateIndex(IndexKeys<Audit>.Descending(x => x.TimeSent));
+            _auditCollection.CreateIndex(IndexKeys<Audit>.Ascending(x => x.CorrelationId));
+        }
+
+        public Audit Get(ObjectId objectId)
+        {
+            return _auditCollection.FindOneById(objectId);
+        }
+
+        public void Remove(DateTime before)
+        {
+            _auditCollection.Remove(Query<Audit>.LT(x => x.TimeSent, before));
+        }
+
+        public IList<Audit> Find(Guid correlationId)
+        {
+            return _auditCollection.Find(Query<Audit>.EQ(x => x.CorrelationId, correlationId)).OrderByDescending(x => x.TimeSent).ToList();
         }
 
         public void InsertAudit(Audit model)

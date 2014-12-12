@@ -20,5 +20,6 @@ namespace R.MessageBus.Monitor.Models
         public string Body { get; set; }
         public string ConsumerType { get; set; }
         public string Language { get; set; }
+        public Guid CorrelationId { get; set; }
     }
 }

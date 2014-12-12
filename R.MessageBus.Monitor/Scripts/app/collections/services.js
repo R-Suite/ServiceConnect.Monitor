@@ -1,10 +1,9 @@
-define(['backbone', 'backbone-pageable'], function(Backbone) {
+define(['backbone'], function(Backbone) {
 
     "use strict";
 
-    var collection = Backbone.PageableCollection.extend({
-        url: "services",
-        mode: "client"
+    var collection = Backbone.Collection.extend({
+        url: "services"
     });
 
     return collection;

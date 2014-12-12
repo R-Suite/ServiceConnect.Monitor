@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
+using MongoDB.Bson;
 using R.MessageBus.Monitor.Interfaces;
 using R.MessageBus.Monitor.Models;
 
@@ -22,11 +21,24 @@ namespace R.MessageBus.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("audits")]
-        public IList<Audit> FindAudits(List<string> tags, DateTime from, DateTime to)
+        public IList<Audit> FindAudits(Guid correlationId)
         {
+            return _auditRepository.Find(correlationId);
+        }
+
+        [AcceptVerbs("GET")]
+        [Route("audits")]
+        public IList<Audit> FindAudits(DateTime from, DateTime to, string tags = null)
+        {
+            List<string> tagList = null;
+            if (!string.IsNullOrEmpty(tags))
+            {
+                tagList = tags.Split(',').ToList();
+            }
+
             var audits = _auditRepository.Find(from, to);
-            
-            if (tags != null && tags.Count > 0)
+
+            if (tagList != null && tagList.Count > 0)
             {
                 var results = new List<Audit>();
 
@@ -34,7 +46,7 @@ namespace R.MessageBus.Monitor.Controllers
 
                 foreach (Audit audit in audits)
                 {
-                    bool match = services.Any(service => audit.MessageType == service.Name && service.Tags != null && service.Tags.Any(tags.Contains));
+                    bool match = services.Any(service => (audit.SourceAddress == service.Name || audit.DestinationAddress == service.Name) && service.Tags != null && service.Tags.Any(tagList.Contains));
                     if (match)
                     {
                         results.Add(audit);
@@ -45,6 +57,13 @@ namespace R.MessageBus.Monitor.Controllers
             }
             
             return audits;
+        }
+
+        [AcceptVerbs("GET")]
+        [Route("audit/{id}")]
+        public Audit Get(string id)
+        {
+            return _auditRepository.Get(new ObjectId(id));
         }
     }
 }

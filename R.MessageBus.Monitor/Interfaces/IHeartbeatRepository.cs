@@ -8,5 +8,8 @@ namespace R.MessageBus.Monitor.Interfaces
     {
         void InsertHeartbeat(Heartbeat heartbeat);
         List<Heartbeat> Find(string name, string location, DateTime @from, DateTime to);
+        void Remove(string name, string location);
+        void EnsureIndex();
+        void Remove(DateTime before);
     }
 }

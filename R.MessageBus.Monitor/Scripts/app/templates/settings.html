@@ -1,0 +1,67 @@
+<div class="content-frame">
+    <div class="content-frame-top">
+        <div class="page-title">
+            <h2><span class="fa fa-cog"></span> Settings</h2>
+        </div>
+    </div>
+    <div class="page-content-wrap">
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form role="form">
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class=" ForwardErrors"> Forward error messages?
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group ForwardErrorQueueContainer" style="display: none;">
+                        <label>Forward Error Queue</label>
+                        <input type="text" class="form-control ForwardErrorQueue" />
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class=" ForwardAudit"> Forward audit messages?
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group ForwardAuditQueueContainer" style="display: none;">
+                        <label>Forward Audit Queue</label>
+                        <input type="text" class="form-control ForwardAuditQueue" />
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox ">
+                            <label>
+                                <input type="checkbox" class=" ForwardHeartbeats"> Forward heartbeat messages?
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group ForwardHeartbeatQueueContainer" style="display: none;">
+                        <label>Forward Heartbeat Queue</label>
+                        <input type="text" class="form-control ForwardHeartbeatQueue" />
+                    </div>
+                    <div class="row" style="padding-bottom: 15px; padding-top: 15px; padding-left: 0; padding-right: 0">
+                        <div class="col-md-12" style="padding-left: 0; padding-right: 0">
+                            <div>
+                                <label>Environments</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary addEnvironment" style="float: right; margin-right: 15px;">Add Environment</button>
+                        </div>
+                    </div>
+                    <div class="row" style="padding-bottom: 15px; padding-left: 0; padding-right: 0">
+                        <div class="col-md-12" style="padding-left: 0; padding-right: 0">
+                            <div class="grid" style="background-color: white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary saveSettings">Save</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</div>

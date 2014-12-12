@@ -13,6 +13,7 @@ namespace R.MessageBus.Monitor.UnitTests.Controllers
     {
         private readonly Mock<IServiceRepository> _mockRepository;
         private readonly Mock<ITagRepository> _mockTagRepository;
+        private readonly Mock<IHeartbeatRepository> _mockHeartbeatRepository;
 
         public ServiceControllerTests()
         {
@@ -73,7 +74,7 @@ namespace R.MessageBus.Monitor.UnitTests.Controllers
         public void ShouldFindAllServices()
         {
             // Arrange
-            var handler = new ServiceController(_mockRepository.Object, _mockTagRepository.Object);
+            var handler = new ServiceController(_mockRepository.Object, _mockTagRepository.Object, _mockHeartbeatRepository.Object);
 
             // Act
             var results = handler.FindServices(null);
@@ -89,7 +90,7 @@ namespace R.MessageBus.Monitor.UnitTests.Controllers
         public void ShouldFindAllEndpoints()
         {
             // Arrange
-            var handler = new ServiceController(_mockRepository.Object, _mockTagRepository.Object);
+            var handler = new ServiceController(_mockRepository.Object, _mockTagRepository.Object, _mockHeartbeatRepository.Object);
 
             // Act
             IList<Service> results = handler.FindEndpoints(null);

@@ -15,17 +15,17 @@ define(['backbone',
         el: ".mainContent",
 
         events: {
-            "change .from": "_fetchHeartbeats",
-            "change .to": "_fetchHeartbeats",
+            "change .from": "_fetchAudits",
+            "change .to": "_fetchAudits",
             "change .timeRange": "_setRange"
         },
 
         initialize: function() {
             _.bindAll(this);
             this.tags = [];
-            this.from = moment.utc().subtract(5, "minutes").format();
+            this.from = moment.utc().subtract(15, "minutes").format();
             this.to = moment.utc().format();
-            this.timer = new Timer(this._updateCollection, 5000);
+            this.timer = new Timer(this._updateCollection, 2000);
         },
 
         render: function() {
@@ -42,8 +42,9 @@ define(['backbone',
             this.$el.find('.to').val(moment.utc(this.to).format("DD/MM/YYYY HH:mm:ss"));
 
             this.collection = new AuditMessagesCollection();
-            this.timer.start();
 
+            this.collection.from = this.from;
+            this.collection.to = this.to;
             this.collection.fetch({
                 success: this._renderViews,
                 data: {
@@ -96,14 +97,17 @@ define(['backbone',
 
         _filterAuditMessages: function() {
             var that = this;
+            this.collection.from = this.from;
+            this.collection.to = this.to;
             this.collection.fetch({
                 data: {
                     from: this.from,
                     to: this.to,
-                    tags: this.tags
+                    tags: this.tags.join()
                 },
                 reset: true,
                 success: function() {
+                    that.auditTableView.refresh();
                     that.auditHistogramView.refresh();
                 }
             });
@@ -111,17 +115,18 @@ define(['backbone',
 
         _renderViews: function() {
             this.auditHistogramView = new AuditHistogramView({
-                collection: this.collection.fullCollection
+                collection: this.collection
             });
-            this.$el.find(".histogram").html(this.auditHistogramView.$el);
+            this.$el.find(".auditHistogram").html(this.auditHistogramView.$el);
             this.renderView(this.auditHistogramView);
             this.auditTableView = new AuditTableView({
-                collection: this.collection
+                collection: this.collection.fullCollection
             });
             this.$el.find(".auditTable").html(this.auditTableView.$el);
             this.renderView(this.auditTableView);
 
             Backbone.Hubs.AuditHub.on("audits", this._addAudits);
+            this.timer.start();
         },
 
         _setRange: function() {
@@ -143,28 +148,72 @@ define(['backbone',
             this.$el.find('.from').val(from.format("DD/MM/YYYY HH:mm:ss"));
             this.$el.find('.to').val(to.format("DD/MM/YYYY HH:mm:ss"));
 
+            var that = this;
+            this.collection.from = this.from;
+            this.collection.to = this.to;
             this.collection.fetch({
                 data: {
                     from: this.from,
                     to: this.to,
-                    tags: this.tags
+                    tags: this.tags.join()
                 },
-                reset: true
+                reset: true,
+                success: function() {
+                    that.auditHistogramView.refresh();
+                    that.auditTableView.refresh();
+                }
+            });
+        },
+
+        _fetchAudits: function() {
+            Backbone.Hubs.AuditHub.off("audits", this._addAudits);
+
+            var from = moment.utc(this.$el.find('.from').val(), "DD/MM/YYYY HH:mm:ss");
+            var to = moment.utc(this.$el.find('.to').val(), "DD/MM/YYYY HH:mm:ss");
+            this.from = from.format();
+            this.to = to.format();
+
+            var that = this;
+            this.collection.from = this.from;
+            this.collection.to = this.to;
+            this.collection.fetch({
+                data: {
+                    from: this.from,
+                    to: this.to,
+                    tags: this.tags.join()
+                },
+                reset: true,
+                success: function() {
+                    that.auditHistogramView.refresh();
+                    that.auditTableView.refresh();
+                }
             });
         },
 
         _addAudits: function(audits) {
+            var from = this._getFromTime();
+            var to = moment.utc();
+            this.from = from.format();
+            this.to = to.format();
+            this.collection.from = this.from;
+            this.collection.to = this.to;
             for (var i = 0; i < audits.length; i++) {
                 this.collection.fullCollection.add(new Backbone.Model(audits[i]), {
                     at: 0
                 });
             }
-            this.auditHistogramView.addAudits(audits);
+            this.auditTableView.addAudits(audits);
+            this.auditHistogramView.refresh();
         },
 
         _updateCollection: function() {
             var from = this._getFromTime();
-
+            var to = moment.utc();
+            this.from = from.format();
+            this.to = to.format();
+            this.collection.from = this.from;
+            this.collection.to = this.to;
+            this.auditTableView.removeMessages(from);
             for (var i = this.collection.fullCollection.length - 1; i >= 0; i--) {
                 var model = this.collection.fullCollection.at(i);
                 if (moment.utc(model.get("TimeSent")) < from) {
@@ -173,6 +222,7 @@ define(['backbone',
                     break;
                 }
             }
+            this.auditHistogramView.refresh();
         },
 
         _getFromTime: function() {

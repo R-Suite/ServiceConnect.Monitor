@@ -1,12 +1,23 @@
 define(['backbone',
     'app/views/endpoints',
     'app/views/auditMessages',
+    'app/views/errorMessages',
     'app/views/endpointDetails',
+    'app/views/auditMessageDetails',
+    'app/views/errorMessageDetails',
     'app/views/navigation',
+    'app/views/settings',
+    'app/views/route',
     'app/collections/heartbeats',
     'app/models/endpoint',
+    'app/models/audit',
+    'app/models/error',
+    'app/models/settings',
     'moment'
-], function(Backbone, EndpointsView, AuditsView, EndpointDetailsView, Navigation, HeartbeatCollection, EndpointModel, moment) {
+], function(Backbone, EndpointsView, AuditsView, ErrorsView, EndpointDetailsView,
+    AuditDetailsView, ErrorDetailsView, Navigation, SettingsView, RouteView,
+    HeartbeatCollection, EndpointModel, AuditModel, ErrorModel, SettingsModel,
+    moment) {
 
     "use strict";
 
@@ -16,7 +27,12 @@ define(['backbone',
             "": "endpoints",
             "endpoints(/)": "endpoints",
             "endpoint/:name/:location": "endpointDetails",
-            "audit(/)": "audits"
+            "audit(/)": "audits",
+            "audit/:id": "auditDetails",
+            "error(/)": "errors",
+            "error/:id": "errorDetails",
+            "settings(/)": "settings",
+            "route/:id": "messageRoute"
         },
 
         before: function(route) {
@@ -39,6 +55,11 @@ define(['backbone',
 
         audits: function() {
             var view = new AuditsView();
+            this.renderView(view);
+        },
+
+        errors: function() {
+            var view = new ErrorsView();
             this.renderView(view);
         },
 
@@ -71,6 +92,56 @@ define(['backbone',
                 });
                 that.renderView(view);
             });
+        },
+
+        auditDetails: function(id) {
+            var that = this;
+            var model = new AuditModel({
+                Id: id
+            });
+            model.fetch({
+                success: function() {
+                    var view = new AuditDetailsView({
+                        model: model
+                    });
+                    that.renderView(view);
+                }
+            });
+        },
+
+        errorDetails: function(id) {
+            var that = this;
+            var model = new ErrorModel({
+                Id: id
+            });
+            model.fetch({
+                success: function() {
+                    var view = new ErrorDetailsView({
+                        model: model
+                    });
+                    that.renderView(view);
+                }
+            });
+        },
+
+        settings: function() {
+            var that = this;
+            var model = new SettingsModel();
+            model.fetch({
+                success: function() {
+                    var view = new SettingsView({
+                        model: model
+                    });
+                    that.renderView(view);
+                }
+            });
+        },
+
+        messageRoute: function(id) {
+            var view = new RouteView({
+                correlationId: id
+            });
+            this.renderView(view);
         }
     });
 

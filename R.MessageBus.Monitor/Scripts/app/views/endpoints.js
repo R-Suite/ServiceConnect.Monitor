@@ -81,15 +81,17 @@ define(['backbone',
         _filterServices: function() {
             var promise1 = this.endpointCollection.fetch({
                 data: {
-                    tags: this.tags
-                }
+                    tags: this.tags.join()
+                },
+                dataType: "json"
             });
             var promise2 = this.serviceMessagesCollection.fetch();
             this.serviceCollection.fetch({
                 data: {
-                    tags: this.tags
+                    tags: this.tags.join()
                 },
-                reset: true
+                reset: true,
+                dataType: "json"
             });
             $.when(promise1, promise2).done(this.endpointGraph.refresh);
         },
@@ -117,9 +119,10 @@ define(['backbone',
         _refresh: function() {
             this.serviceCollection.fetch({
                 data: {
-                    tags: this.tags
+                    tags: this.tags.join()
                 },
-                reset: true
+                reset: true,
+                dataType: "json"
             });
         },
 

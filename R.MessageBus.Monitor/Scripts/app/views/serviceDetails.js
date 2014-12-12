@@ -5,15 +5,17 @@ define(['backbone',
     "backgrid",
     'app/collections/messageTypes',
     'toastr',
+    'app/views/deleteServiceModal',
     'select2'
-], function(Backbone, _, $, template, Backgrid, MessageTypeCollection, toastr) {
+], function(Backbone, _, $, template, Backgrid, MessageTypeCollection, toastr, DeleteServiceModal) {
 
     "use strict";
 
     var view = Backbone.View.extend({
 
         events: {
-            "click .saveServiceDetails": "_saveDetails"
+            "click .saveServiceDetails": "_saveDetails",
+            "click .deleteService": "_showDeleteModal"
         },
 
         columns: [{
@@ -155,6 +157,14 @@ define(['backbone',
                     toastr.success("Saved Service Tags");
                 }
             });
+        },
+
+        _showDeleteModal: function(e) {
+            e.preventDefault();
+            var modal = new DeleteServiceModal({
+                model: this.model
+            });
+            $("body").append(modal.render().$el);
         },
 
         onClose: function() {

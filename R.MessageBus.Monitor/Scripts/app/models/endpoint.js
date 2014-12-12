@@ -4,7 +4,7 @@ define(['backbone'], function(Backbone) {
 
     var model = Backbone.Model.extend({
         idAttribute: 'Id',
-        url: "service"
+        urlRoot: "service"
     });
 
     return model;
