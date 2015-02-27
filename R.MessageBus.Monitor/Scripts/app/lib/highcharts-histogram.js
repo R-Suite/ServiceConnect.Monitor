@@ -13,10 +13,10 @@
         // code before the original init function
         var data = userOptions.series[0].data;
         var n = data.length;
-        //var binCountSturges = Math.ceil( Math.log(n) / Math.LN2 + 1 );; // optimal # bins, Sturges' formula
-        var binCountSturges = 30; // optimal # bins, Sturges' formula
-        min = Number.MAX_VALUE;
-        max = Number.MIN_VALUE;
+        var binCountSturges = Math.ceil(Math.log(n) / Math.LN2 + 1);; // optimal # bins, Sturges' formula
+        //var binCountSturges = 30; // optimal # bins, Sturges' formula
+        var min = Number.MAX_VALUE;
+        var max = Number.MIN_VALUE;
         for (var i = 0; i < n; i++) {
             min = Math.min(min, data[i]);
             max = Math.max(max, data[i]);

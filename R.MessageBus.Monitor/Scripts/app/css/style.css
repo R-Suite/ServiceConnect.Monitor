@@ -8295,3 +8295,15 @@ fieldset[disabled] .form-control {
 .json .key {
     color: black;
 }
+.padded-bottom {
+    padding: 10px;
+}
+.padded-top {
+    padding: 10px;
+}
+.padded-right {
+    padding: 10px;
+}
+.padded-left {
+    padding: 10px;
+}

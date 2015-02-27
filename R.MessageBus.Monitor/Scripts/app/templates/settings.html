@@ -9,55 +9,125 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <form role="form">
-                    <div class="form-group">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" class=" ForwardErrors"> Forward error messages?
-                            </label>
+                    <div class="row padded-bottom">
+                        <div class="col-md-12">
+                            <h3>Message Forwarding</h3>
                         </div>
                     </div>
-                    <div class="form-group ForwardErrorQueueContainer" style="display: none;">
-                        <label>Forward Error Queue</label>
-                        <input type="text" class="form-control ForwardErrorQueue" />
-                    </div>
-                    <div class="form-group">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" class=" ForwardAudit"> Forward audit messages?
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group ForwardAuditQueueContainer" style="display: none;">
-                        <label>Forward Audit Queue</label>
-                        <input type="text" class="form-control ForwardAuditQueue" />
-                    </div>
-                    <div class="form-group">
-                        <div class="checkbox ">
-                            <label>
-                                <input type="checkbox" class=" ForwardHeartbeats"> Forward heartbeat messages?
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group ForwardHeartbeatQueueContainer" style="display: none;">
-                        <label>Forward Heartbeat Queue</label>
-                        <input type="text" class="form-control ForwardHeartbeatQueue" />
-                    </div>
-                    <div class="row" style="padding-bottom: 15px; padding-top: 15px; padding-left: 0; padding-right: 0">
-                        <div class="col-md-12" style="padding-left: 0; padding-right: 0">
-                            <div>
-                                <label>Environments</label>
+                    <div class="row padded-bottom">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" class=" ForwardErrors"> Forward error messages?
+                                    </label>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-primary addEnvironment" style="float: right; margin-right: 15px;">Add Environment</button>
-                        </div>
-                    </div>
-                    <div class="row" style="padding-bottom: 15px; padding-left: 0; padding-right: 0">
-                        <div class="col-md-12" style="padding-left: 0; padding-right: 0">
-                            <div class="grid" style="background-color: white">
+                            <div class="form-group ForwardErrorQueueContainer" style="display: none;">
+                                <label>Forward Error Queue</label>
+                                <input type="text" class="form-control ForwardErrorQueue" />
                             </div>
-                        </div>
-                    </div>
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" class=" ForwardAudit"> Forward audit messages?
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group ForwardAuditQueueContainer" style="display: none;">
+                                <label>Forward Audit Queue</label>
+                                <input type="text" class="form-control ForwardAuditQueue" />
+                            </div>
+                            <div class="form-group">
+                                <div class="checkbox ">
+                                    <label>
+                                        <input type="checkbox" class=" ForwardHeartbeats"> Forward heartbeat messages?
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group ForwardHeartbeatQueueContainer" style="display: none;">
+                                <label>Forward Heartbeat Queue</label>
+                                <input type="text" class="form-control ForwardHeartbeatQueue" />
+                            </div>
 
-                    <button type="submit" class="btn btn-primary saveSettings">Save</button>
+                        </div>
+                    </div>
+                    <div class="row padded-bottom">
+                        <div class="col-md-12">
+                            <h3>Environments</h3>
+                            <button type="submit" class="btn btn-primary addEnvironment pull-right">Add Environment</button>
+                        </div>
+                    </div>
+                    <div class="row padded-bottom">
+                        <div class="col-md-12">
+                            <div class="grid" style="background-color: white; width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row padded-top">
+                        <div class="col-md-12">
+                            <h3>Expiry</h3>
+                            <p>Leave input empty to keep forever.</p>
+                        </div>
+                    </div>
+                    <div class="row  padded-bottom">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <div class="row" style="margin-right: -10px; margin-left: -10px;">
+                                    <div class="col-md-12">
+                                        <label>Audits</label>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-right: -10px; margin-left: -10px;">
+                                    <div class="col-md-6">
+                                        <input type="number" min="1" class="form-control auditExpiry" />
+                                    </div>
+                                    <div class="col-md-6" style="line-height: 2.5;">
+                                        days
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row" style="margin-right: -10px; margin-left: -10px;">
+                                    <div class="col-md-12">
+                                        <label>Errors</label>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-right: -10px; margin-left: -10px;">
+                                    <div class="col-md-6">
+                                        <input type="number" min="1" class="form-control errorExpiry" />
+                                    </div>
+                                    <div class="col-md-6" style="line-height: 2.5;">
+                                        days
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row" style="margin-right: -10px; margin-left: -10px;">
+                                    <div class="col-md-12">
+                                        <label>Heartbeats</label>
+                                    </div>
+                                </div>
+                                <div class="row" style="margin-right: -10px; margin-left: -10px;">
+                                    <div class="col-md-6">
+                                        <input type="number" min="1" class="form-control heartbeatExpiry" />
+                                    </div>
+                                    <div class="col-md-6" style="line-height: 2.5;">
+                                        days
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row padded-bottom">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary saveSettings">Save</button>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>

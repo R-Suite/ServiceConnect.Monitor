@@ -108,9 +108,9 @@ define(['backbone',
                     return value;
                 }
             },
-            ".KeepErrorsFor": "KeepErrorsFor",
-            ".KeepAuditsFor": "KeepAuditsFor",
-            ".KeepHeartbeatsFor": "KeepHeartbeatsFor"
+            ".auditExpiry": "KeepAuditsFor",
+            ".errorExpiry": "KeepErrorsFor",
+            ".heartbeatExpiry": "KeepHeartbeatsFor"
         },
 
         initialize: function() {
