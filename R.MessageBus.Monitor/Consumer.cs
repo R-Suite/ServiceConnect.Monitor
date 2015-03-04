@@ -7,7 +7,7 @@ using RabbitMQ.Client.Events;
 
 namespace R.MessageBus.Monitor
 {
-    public delegate void ConsumerEventHandler(string message, IDictionary<string, string> headers);
+    public delegate void ConsumerEventHandler(string message, IDictionary<string, string> headers, string host);
 
     public class Consumer : IDisposable
     {
@@ -48,7 +48,7 @@ namespace R.MessageBus.Monitor
 
             string message = Encoding.UTF8.GetString(args.Body);
 
-            _consumerEventHandler(message, headers);
+            _consumerEventHandler(message, headers, _host);
 
             if (!string.IsNullOrEmpty(_forwardQueue))
             {

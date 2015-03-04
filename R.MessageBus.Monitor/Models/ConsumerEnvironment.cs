@@ -16,5 +16,6 @@ namespace R.MessageBus.Monitor.Models
         public string AuditQueue { get; set; }
         public string ErrorQueue { get; set; }
         public string HeartbeatQueue { get; set; }
+        public Producer Producer { get; set; }
     }
 }

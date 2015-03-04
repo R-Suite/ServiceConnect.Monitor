@@ -221,6 +221,7 @@
     <Compile Include="Models\ServiceMessage.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\Tag.cs" />
+    <Compile Include="Producer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\AuditRepository.cs" />
     <Compile Include="Interfaces\IServiceMessageRepository.cs" />
@@ -266,6 +267,7 @@
     <Content Include="Scripts\app\templates\auditHistogram.html" />
     <Content Include="Scripts\app\templates\auditTable.html" />
     <Content Include="Scripts\app\templates\auditMessageDetails.html" />
+    <Content Include="Scripts\app\templates\errorRetryModal.html" />
     <Content Include="Scripts\app\templates\route.html" />
     <Content Include="Scripts\app\templates\settings.html" />
     <Content Include="Scripts\app\templates\exceptionModal.html" />
@@ -288,6 +290,7 @@
     <Content Include="Scripts\app\views\auditTable.js" />
     <Content Include="Scripts\app\views\auditHistogram.js" />
     <Content Include="Scripts\app\views\auditMessageDetails.js" />
+    <Content Include="Scripts\app\views\errorRetryModal.js" />
     <Content Include="Scripts\app\views\route.js" />
     <Content Include="Scripts\app\views\settings.js" />
     <Content Include="Scripts\app\views\exceptionModal.js" />

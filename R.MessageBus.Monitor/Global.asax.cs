@@ -58,12 +58,13 @@ namespace R.MessageBus.Monitor
                     HeartbeatMessageHandler = new HearbeatMessageHandler(ObjectFactory.GetInstance<IHeartbeatRepository>(), heartbeatHub),
                     AuditConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
                     ErrorConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
-                    HeartbeatConsumer = new Consumer(environment.Server, environment.Username, environment.Password)
+                    HeartbeatConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
+                    Producer = new Producer(environment.Server, environment.Username, environment.Password)
                 };
                 string forwardErrorQueue = null;
                 string forwardAuditQueue = null;
                 string forwardHeartbeatQueue = null;
-
+               
                 if (settings.ForwardAudit)
                 {
                     forwardAuditQueue = settings.ForwardAuditQueue;
@@ -84,12 +85,15 @@ namespace R.MessageBus.Monitor
                 Globals.Environments.Add(consumerEnvironment);
             }
 
-            var timer = new Timer(AuditCallback, settings, 0, 300000);
-            Globals.Timers.Add(timer);
-            timer = new Timer(ErrorCallback, settings, 0, 300000);
-            Globals.Timers.Add(timer);
-            timer = new Timer(HeartbeatCallback, settings, 0, 300000);
-            Globals.Timers.Add(timer);
+            Globals.AuditExpiry = settings.KeepAuditsFor;
+            var timer = new Timer(AuditCallback, settings, 0, 3600000);
+            Globals.Timers["Audit"] = timer;
+            Globals.ErrorExpiry = settings.KeepErrorsFor;
+            timer = new Timer(ErrorCallback, settings, 0, 3600000);
+            Globals.Timers["Error"] = timer;
+            Globals.HeartbeatExpiry = settings.KeepHeartbeatsFor;
+            timer = new Timer(HeartbeatCallback, settings, 0, 3600000);
+            Globals.Timers["Heartbeat"] = timer;
 
             var auditRepository = ObjectFactory.GetInstance<IAuditRepository>();
             auditRepository.EnsureIndex();
@@ -105,7 +109,7 @@ namespace R.MessageBus.Monitor
 
         private void AuditCallback(object state)
         {
-            var period = ((Settings) state).KeepAuditsFor;
+            var period = Globals.AuditExpiry;
             if (!string.IsNullOrEmpty(period) && period != "Forever")
             {
                 var repository = ObjectFactory.GetInstance<IAuditRepository>();
@@ -115,7 +119,7 @@ namespace R.MessageBus.Monitor
 
         private void ErrorCallback(object state)
         {
-            var period = ((Settings)state).KeepErrorsFor;
+            var period = Globals.ErrorExpiry;
             if (!string.IsNullOrEmpty(period) && period != "Forever")
             {
                 var repository = ObjectFactory.GetInstance<IErrorRepository>();
@@ -125,7 +129,7 @@ namespace R.MessageBus.Monitor
 
         private void HeartbeatCallback(object state)
         {
-            var period = ((Settings)state).KeepHeartbeatsFor;
+            var period = Globals.HeartbeatExpiry;
             if (!string.IsNullOrEmpty(period) && period != "Forever")
             {
                 var repository = ObjectFactory.GetInstance<IHeartbeatRepository>();
@@ -145,9 +149,9 @@ namespace R.MessageBus.Monitor
                 environment.HeartbeatConsumer.Dispose();
             }
 
-            foreach (Timer timer in Globals.Timers)
+            foreach (var timer in Globals.Timers)
             {
-                timer.Dispose();
+                timer.Value.Dispose();
             }
         }
     }

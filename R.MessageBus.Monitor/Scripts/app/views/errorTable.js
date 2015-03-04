@@ -17,69 +17,72 @@ define(['backbone',
             "click .exceptionBody": "_showException"
         },
 
-        columns: [{
-            id: "TypeName",
-            field: "TypeName",
-            name: "Message Type"
-        }, {
-            id: "TimeSent",
-            name: "Time Sent",
-            field: "TimeSent",
-            formatter: function(row, col, val, colDefinition, model) {
-                return moment.utc(val).format("DD/MM/YYYY HH:mm:ss.SSS");
-            },
-            width: 100
-        }, {
-            id: "SourceAddress",
-            field: "SourceAddress",
-            name: "Source Address"
-        }, {
-            id: "DestinationAddress",
-            field: "DestinationAddress",
-            name: "Destination Address"
-        }, {
-            id: "ExceptionType",
-            field: "Exception",
-            name: "Exception Type",
-            formatter: function(row, col, val, colDefinition, model) {
-                return val.ExceptionType;
-            }
-        }, {
-            id: "Exception",
-            field: "Exception",
-            name: "Error",
-            width: 20,
-            formatter: function(row, col, val, colDefinition, model) {
-                return "<div style='width: 100%; text-align: center'><i class='fa fa-exclamation-circle exceptionBody' id-attr='" + model.Id + "' style='cursor: pointer; cursor: hand;'></i></div>";
-            }
-        }, {
-            id: "Body",
-            field: "Body",
-            name: "Body",
-            width: 20,
-            formatter: function(row, col, val, colDefinition, model) {
-                return "<div style='width: 100%; text-align: center'><i class='fa fa-envelope-o messageBody' id-attr='" + model.Id + "' style='cursor: pointer; cursor: hand;'></i></div>";
-            }
-        }, {
-            id: "Route",
-            field: "CorrelationId",
-            name: "",
-            width: 40,
-            formatter: function(row, col, val, colDefinition, model) {
-                return "<a href='#route/" + val + "' >Session</a>";
-            }
-        }, {
-            id: "Id",
-            field: "Id",
-            name: "",
-            width: 40,
-            formatter: function(row, col, val, colDefinition, model) {
-                return "<a href='#error/" + val + "' >Details</a>";
-            }
-        }],
+        columns: function() {
+            return [{
+                id: "TypeName",
+                field: "TypeName",
+                name: "Message Type"
+            }, {
+                id: "TimeSent",
+                name: "Time Sent",
+                field: "TimeSent",
+                formatter: function(row, col, val, colDefinition, model) {
+                    return moment.utc(val).format("DD/MM/YYYY HH:mm:ss.SSS");
+                },
+                width: 100
+            }, {
+                id: "SourceAddress",
+                field: "SourceAddress",
+                name: "Source Address"
+            }, {
+                id: "DestinationAddress",
+                field: "DestinationAddress",
+                name: "Destination Address"
+            }, {
+                id: "ExceptionType",
+                field: "Exception",
+                name: "Exception Type",
+                formatter: function(row, col, val, colDefinition, model) {
+                    return val.ExceptionType;
+                }
+            }, {
+                id: "Exception",
+                field: "Exception",
+                name: "Error",
+                width: 20,
+                formatter: function(row, col, val, colDefinition, model) {
+                    return "<div style='width: 100%; text-align: center'><i class='fa fa-exclamation-circle exceptionBody' id-attr='" + model.Id + "' style='cursor: pointer; cursor: hand;'></i></div>";
+                }
+            }, {
+                id: "Body",
+                field: "Body",
+                name: "Body",
+                width: 20,
+                formatter: function(row, col, val, colDefinition, model) {
+                    return "<div style='width: 100%; text-align: center'><i class='fa fa-envelope-o messageBody' id-attr='" + model.Id + "' style='cursor: pointer; cursor: hand;'></i></div>";
+                }
+            }, {
+                id: "Route",
+                field: "CorrelationId",
+                name: "",
+                width: 40,
+                formatter: function(row, col, val, colDefinition, model) {
+                    return "<a href='#route/" + val + "' >Session</a>";
+                }
+            }, {
+                id: "Id",
+                field: "Id",
+                name: "",
+                width: 40,
+                formatter: function(row, col, val, colDefinition, model) {
+                    return "<a href='#error/" + val + "' >Details</a>";
+                }
+            }];
+        },
 
-        initialize: function() {
+        initialize: function(options) {
             _.bindAll(this);
+            this.onRetryComplete = options.onRetryComplete;
         },
 
         render: function() {
@@ -97,7 +100,18 @@ define(['backbone',
                 forceFitColumns: true
             };
 
-            this.grid = new Slick.Grid(".grid", this.data, this.columns, options);
+            var checkboxSelector = new Slick.CheckboxSelectColumn({
+                cssClass: "slick-cell-checkboxsel"
+            });
+            var columns = this.columns();
+            columns.unshift(checkboxSelector.getColumnDefinition());
+
+            this.grid = new Slick.Grid(".grid", this.data, columns, options);
+
+            this.grid.setSelectionModel(new Slick.RowSelectionModel({
+                selectActiveRow: false
+            }));
+            this.grid.registerPlugin(checkboxSelector);
         },
 
         _showMessageBody: function(e) {
@@ -122,17 +136,33 @@ define(['backbone',
             $("body").append(modal.render().$el);
         },
 
+        getSelected: function() {
+            var data = this.grid.getData();
+            var rows = this.grid.getSelectedRows();
+            var returnData = [];
+            for (var i = 0; i < rows.length; i++) {
+                returnData.push(data[rows[i]]);
+            }
+            return returnData;
+        },
+
         removeMessages: function(from) {
+            var dataRemoved = false;
             for (var i = this.data.length - 1; i >= 0; i--) {
                 var model = this.data[i];
                 if (moment.utc(model.TimeSent) < from) {
+                    dataRemoved = true;
                     this.data.splice(i, 1);
                 } else {
                     break;
                 }
             }
-            this.grid.updateRowCount();
-            this.grid.render();
+
+            if (dataRemoved) {
+                this.grid.setSelectedRows([]);
+                this.grid.updateRowCount();
+                this.grid.render();
+            }
         },
 
         refresh: function() {
@@ -144,6 +174,7 @@ define(['backbone',
             for (var i = 0; i < models.length; i++) {
                 this.data.push(models[i]);
             }
+            this.grid.setSelectedRows([]);
             this.grid.updateRowCount();
             this.grid.render();
         },

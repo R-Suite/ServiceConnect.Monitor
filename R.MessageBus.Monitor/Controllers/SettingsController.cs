@@ -31,6 +31,19 @@ namespace R.MessageBus.Monitor.Controllers
         [Route("settings")]
         public Settings UpdateSettings(Settings model)
         {
+            if (string.IsNullOrEmpty(model.KeepAuditsFor))
+            {
+                model.KeepAuditsFor = "Forever";
+            }
+            if (string.IsNullOrEmpty(model.KeepErrorsFor))
+            {
+                model.KeepErrorsFor = "Forever";
+            }
+            if (string.IsNullOrEmpty(model.KeepHeartbeatsFor))
+            {
+                model.KeepHeartbeatsFor = "Forever";
+            }
+
             _settingsRepository.Update(model);
 
             if (model.ForwardAudit == false)

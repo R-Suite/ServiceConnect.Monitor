@@ -1,11 +1,12 @@
 ﻿using System;
 using MongoDB.Bson;
+using System.Collections.Generic;
 
 namespace R.MessageBus.Monitor.Models
 {
     public class Error
     {
-        public ObjectId Id { get; set; }
+        public Guid Id { get; set; }
         public DateTime TimeReceived { get; set; }
         public string DestinationMachine { get; set; }
         public DateTime TimeProcessed { get; set; }
@@ -22,5 +23,7 @@ namespace R.MessageBus.Monitor.Models
         public string ConsumerType { get; set; }
         public string Language { get; set; }
         public Guid CorrelationId { get; set; }
+        public string Server { get; set; }
+        public IDictionary<string, string> Headers { get; set; }
     }
 }

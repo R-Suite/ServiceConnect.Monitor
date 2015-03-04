@@ -47,7 +47,7 @@ namespace R.MessageBus.Monitor.UnitTests.Handlers
             var handler = new AuditMessageHandler(_mockRepository.Object, _mockContext.Object);
 
             // Act
-            handler.Execute("TestMessage", _headers);
+            handler.Execute("TestMessage", _headers, string.Empty);
 
             // Assert
             _mockRepository.Verify(x => x.InsertAudit(It.Is<Audit>(m =>

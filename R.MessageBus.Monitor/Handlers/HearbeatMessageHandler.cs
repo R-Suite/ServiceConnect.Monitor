@@ -24,7 +24,7 @@ namespace R.MessageBus.Monitor.Handlers
             _timer = new Timer(callback, null, 0, 2500);
         }
 
-        public void Execute(string message, IDictionary<string, string> headers)
+        public void Execute(string message, IDictionary<string, string> headers, string host)
         {
             var heartbeat = JsonConvert.DeserializeObject<Heartbeat>(message);
 

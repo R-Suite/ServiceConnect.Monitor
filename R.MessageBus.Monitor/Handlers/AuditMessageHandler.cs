@@ -25,7 +25,7 @@ namespace R.MessageBus.Monitor.Handlers
             _timer = new Timer(callback, null, 0, 2500);
         }
 
-        public void Execute(string message, IDictionary<string, string> headers)
+        public void Execute(string message, IDictionary<string, string> headers, string host)
         {
             lock (_lock)
             {
@@ -45,7 +45,9 @@ namespace R.MessageBus.Monitor.Handlers
                     TimeReceived = DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture),
                     TimeSent = DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture),
                     Language = headers["Language"],
-                    CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId
+                    CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId,
+                    Server = host,
+                    Headers = headers
                 };
 
                 _auditRepository.InsertAudit(audit);

@@ -5,8 +5,10 @@ define(['backbone',
     "app/collections/errorMessages",
     "app/views/errorTable",
     "app/views/errorHistogram",
-    "app/helpers/timer"
-], function(Backbone, _, $, template, ErrorMessagesCollection, ErrorTableView, ErrorHistogramView, Timer) {
+    "app/helpers/timer",
+    "toastr",
+    "app/views/errorRetryModal"
+], function(Backbone, _, $, template, ErrorMessagesCollection, ErrorTableView, ErrorHistogramView, Timer, toastr, RetryModal) {
 
     "use strict";
 
@@ -17,7 +19,9 @@ define(['backbone',
         events: {
             "change .from": "_fetchErrors",
             "change .to": "_fetchErrors",
-            "change .timeRange": "_setRange"
+            "change .timeRange": "_setRange",
+            "click .retryAll": "_retryAllMessages",
+            "click .retrySelected": "_retrySelectedMessages"
         },
 
         initialize: function() {
@@ -120,7 +124,8 @@ define(['backbone',
             this.$el.find(".errorHistogram").html(this.errorHistogramView.$el);
             this.renderView(this.errorHistogramView);
             this.errorTableView = new ErrorTableView({
-                collection: this.collection
+                collection: this.collection,
+                onRetryComplete: this._filterErrorMessages
             });
             this.$el.find(".errorTable").html(this.errorTableView.$el);
             this.renderView(this.errorTableView);
@@ -274,6 +279,23 @@ define(['backbone',
                     from = moment.utc().subtract(5, "minutes");
             }
             return from;
+        },
+
+        _retryAllMessages: function() {
+            var modal = new RetryModal({
+                collection: this.collection,
+                onComplete: this._filterErrorMessages
+            });
+            $("body").append(modal.render().$el);
+        },
+
+        _retrySelectedMessages: function() {
+            var data = this.errorTableView.getSelected();
+            var modal = new RetryModal({
+                collection: new ErrorMessagesCollection(data),
+                onComplete: this._filterErrorMessages
+            });
+            $("body").append(modal.render().$el);
         },
 
         onClose: function() {

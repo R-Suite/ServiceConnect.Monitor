@@ -22,7 +22,9 @@
         "slickgrid": "bower_components/slickgrid/slick.grid",
         "jquery.event.drag": "app/lib/jquery.event.drag-2.2",
         "slick.core": "bower_components/slickgrid/slick.core",
-        "highcharts-histogram": "app/lib/highcharts-histogram"
+        "highcharts-histogram": "app/lib/highcharts-histogram",
+        "slick.checkboxselectcolumn": "bower_components/slickgrid/plugins/slick.checkboxselectcolumn",
+        "slick.rowselectionmodel": "bower_components/slickgrid/plugins/slick.rowselectionmodel"
     },
     shim: {
         "highcharts-histogram": {
@@ -41,6 +43,12 @@
                 "slick.core"
             ],
             "exports": "Slick"
+        },
+        "slick.checkboxselectcolumn": {
+            "deps": ["jquery", "slickgrid"]
+        },
+        "slick.rowselectionmodel": {
+            "deps": ["jquery", "slickgrid"]
         },
         "highchartsMain": {
             "exports": "Highcharts",
@@ -111,7 +119,9 @@ require(['backbone',
          'signalr',
          "signalr.hubs",
          "slickgrid",
-         "highcharts-histogram"],
+         "highcharts-histogram",
+         "slick.checkboxselectcolumn",
+         "slick.rowselectionmodel"],
 function (Backbone, $, toastr, Router, Highcharts) {
     Backbone.Application = {};
     Backbone.Application.Router = new Router();

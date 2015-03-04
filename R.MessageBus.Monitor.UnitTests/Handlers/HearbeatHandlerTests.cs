@@ -43,7 +43,7 @@ namespace R.MessageBus.Monitor.UnitTests.Handlers
             var handler = new HearbeatMessageHandler(_mockRepository.Object, _mockContext.Object);
 
             // Act
-            handler.Execute(JsonConvert.SerializeObject(_message), _headers);
+            handler.Execute(JsonConvert.SerializeObject(_message), _headers, string.Empty);
 
             // Assert
             _mockRepository.Verify(x => x.InsertHeartbeat(It.Is<Heartbeat>(m =>

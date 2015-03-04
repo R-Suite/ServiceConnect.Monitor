@@ -15,7 +15,8 @@
         "bower_components/slickgrid/slick.grid.css",
         "app/css/slick-default-theme.css",
         "app/css/bootstrap.css",
-        "app/css/style.css"
+        "app/css/style.css",
+        "bower_components/slickgrid/controls/slick.columnpicker.css"
     ];
 
     require("matchdep").filterDev("grunt-*").forEach(grunt.loadNpmTasks);

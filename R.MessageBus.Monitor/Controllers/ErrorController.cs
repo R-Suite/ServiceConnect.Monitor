@@ -63,7 +63,30 @@ namespace R.MessageBus.Monitor.Controllers
         [Route("error/{id}")]
         public Error Get(string id)
         {
-            return _errorRepository.Get(new ObjectId(id));
+            return _errorRepository.Get(new Guid(id));
+        }
+
+        [AcceptVerbs("POST")]
+        [Route("errors/retry")]
+        public bool RetryAll(List<Error> errors) 
+        {
+            foreach (var error in errors)
+            {
+                var env = Globals.Environments.FirstOrDefault(x => x.Server == error.Server);
+
+                error.Headers.Remove("TimeReceived");
+                error.Headers.Remove("DestinationMachine");
+                error.Headers.Remove("DestinationAddress");
+                error.Headers.Remove("RetryCount");
+                error.Headers.Remove("Exception");
+                if (env != null)
+                {
+                    env.Producer.Send(error.DestinationAddress, error.Body, error.Headers);
+                    _errorRepository.Remove(error.Id);
+                }
+            }
+
+        	return true;
         }
     }
 }

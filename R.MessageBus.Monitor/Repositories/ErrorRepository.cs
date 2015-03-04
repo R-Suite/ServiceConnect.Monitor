@@ -40,14 +40,19 @@ namespace R.MessageBus.Monitor.Repositories
             return result.ToList();
         }
 
-        public Error Get(ObjectId id)
-        {
+        public Error Get(Guid id)
+        {        	
             return _errorCollection.FindOneById(id);
         }
 
         public void Remove(DateTime before)
         {
             _errorCollection.Remove(Query<Error>.LT(x => x.TimeSent, before));
+        }
+
+        public void Remove(Guid id)
+        {
+            _errorCollection.Remove(Query<Error>.EQ(x => x.Id, id));
         }
 
         public IList<Error> Find(Guid correlationId)

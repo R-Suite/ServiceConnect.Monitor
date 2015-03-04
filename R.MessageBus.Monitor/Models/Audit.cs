@@ -1,5 +1,6 @@
 ﻿using System;
 using MongoDB.Bson;
+using System.Collections.Generic;
 
 namespace R.MessageBus.Monitor.Models
 {
@@ -21,5 +22,7 @@ namespace R.MessageBus.Monitor.Models
         public string ConsumerType { get; set; }
         public string Language { get; set; }
         public Guid CorrelationId { get; set; }
+        public IDictionary<string, string> Headers { get; set; }
+        public string Server { get; set; }
     }
 }

@@ -10,8 +10,9 @@ namespace R.MessageBus.Monitor.Interfaces
         void InsertError(Error model);
         void EnsureIndex();
         IList<Error> Find(DateTime @from, DateTime to);
-        Error Get(ObjectId id);
+        Error Get(Guid id);
         void Remove(DateTime before);
         IList<Error> Find(Guid correlationId);
+        void Remove(Guid guid);
     }
 }
