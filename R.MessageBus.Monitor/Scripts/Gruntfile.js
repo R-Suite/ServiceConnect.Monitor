@@ -24,22 +24,7 @@
     grunt.initConfig({
 
         pkg: grunt.file.readJSON('package.json'),
-
-        connect: {
-            test: {
-                options: {
-                    port:9009
-                }
-            }
-        },
-
-        exec: {
-            jasmine: {
-                command: 'phantomjs tests/run-jasmine.js http://localhost:9009/tests',
-                stdout: true
-            }
-        },
-
+        
         jsbeautifier: {
             files: ["app/**"],
             options: {}
@@ -83,7 +68,7 @@
         },
 
         watch: {
-            files: ["app/**", "tests/**"],
+            files: ["app/**"],
             tasks: ['default']
         }
         
@@ -92,7 +77,6 @@
     grunt.loadNpmTasks('grunt-contrib-cssmin');
 
     grunt.registerTask('server', ['connect', 'watch']);
-    grunt.registerTask('test', ['connect', 'exec', 'watch']);
     grunt.registerTask('default', ['cssmin', 'jsbeautifier', 'jshint']);
     grunt.registerTask('dist', ['jsbeautifier', 'jshint', 'cssmin', 'requirejs', 'sloc']);
 };

@@ -73,7 +73,7 @@ namespace R.MessageBus.Monitor
             var connectionFactory = new ConnectionFactory
             {
                 HostName = _host,
-                Protocol = Protocols.FromEnvironment(),
+                Protocol = Protocols.DefaultProtocol,
                 Port = AmqpTcpEndpoint.UseDefaultPort,
                 RequestedHeartbeat = 30
             };
@@ -99,7 +99,7 @@ namespace R.MessageBus.Monitor
                 ConfigureQueue(_forwardQueue);
             }
 
-            var consumer = new EventingBasicConsumer();
+            var consumer = new EventingBasicConsumer(_model);
             consumer.Received += Event;
             consumer.Shutdown += ConsumerShutdown;
             _model.BasicConsume(queueName, false, consumer);

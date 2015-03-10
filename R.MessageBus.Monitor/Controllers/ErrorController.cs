@@ -5,6 +5,7 @@ using System.Web.Http;
 using MongoDB.Bson;
 using R.MessageBus.Monitor.Interfaces;
 using R.MessageBus.Monitor.Models;
+using StructureMap;
 
 namespace R.MessageBus.Monitor.Controllers
 {
@@ -13,10 +14,10 @@ namespace R.MessageBus.Monitor.Controllers
         private readonly IErrorRepository _errorRepository;
         private readonly IServiceRepository _serviceRepository;
 
-        public ErrorController(IErrorRepository errorRepository, IServiceRepository serviceRepository)
+        public ErrorController()
         {
-            _errorRepository = errorRepository;
-            _serviceRepository = serviceRepository;
+            _errorRepository = ObjectFactory.GetInstance<IErrorRepository>();
+            _serviceRepository = ObjectFactory.GetInstance<IServiceRepository>();
         }
 
         [AcceptVerbs("GET")]

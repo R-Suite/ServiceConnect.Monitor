@@ -24,7 +24,7 @@ namespace R.MessageBus.Monitor
             {
                 HostName = _host,
                 VirtualHost = "/",
-                Protocol = Protocols.FromEnvironment(),
+                Protocol = Protocols.DefaultProtocol,
                 Port = AmqpTcpEndpoint.UseDefaultPort
             };
 
