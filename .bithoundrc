@@ -1,0 +1,5 @@
+{
+  "ignore": [
+    "R.MessageBus.Monitor/Scripts/app/lib/**"
+  ]
+}
