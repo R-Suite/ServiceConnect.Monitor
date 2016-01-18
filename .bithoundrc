@@ -1,6 +1,6 @@
 {
   "ignore": [
-    "R.MessageBus.Monitor/Scripts/app/lib/**",
-    "R.MessageBus.Monitor/Scripts/require.js"
+    "ServiceConnect.Monitor/Scripts/app/lib/**",
+    "ServiceConnect.Monitor/Scripts/require.js"
   ]
 }

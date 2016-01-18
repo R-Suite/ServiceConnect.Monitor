@@ -1,1 +1,1 @@
-[![bitHound Score](https://www.bithound.io/github/R-Suite/R.MessageBus.Monitor/badges/score.svg)](https://www.bithound.io/github/R-Suite/R.MessageBus.Monitor/master)
+[![bitHound Score](https://www.bithound.io/github/R-Suite/ServiceConnect.Monitor/badges/score.svg)](https://www.bithound.io/github/R-Suite/ServiceConnect.Monitor/master)
