@@ -17,8 +17,6 @@ namespace ServiceConnect.Monitor
 {
     class Program
     {
-        public static IDisposable WebAppStart { get; set; }
-
         public class Service : ServiceBase
         {
             public Service()
@@ -55,7 +53,7 @@ namespace ServiceConnect.Monitor
         }
 
         private static IContainer _container;
-        
+        private static IDisposable _webApp;
 
         private static void Start(string[] args)
         {
@@ -77,7 +75,7 @@ namespace ServiceConnect.Monitor
                 });
             });
 
-            WebAppStart = WebApp.Start<AuditConfig>("http://*:" + System.Configuration.ConfigurationManager.AppSettings["Port"]);
+            _webApp = WebApp.Start<AuditConfig>("http://*:" + System.Configuration.ConfigurationManager.AppSettings["Port"]);
 
             var auditHub = GlobalHost.ConnectionManager.GetHubContext<AuditHub>();
             var errorHub = GlobalHost.ConnectionManager.GetHubContext<ErrorHub>();
@@ -186,7 +184,7 @@ namespace ServiceConnect.Monitor
             foreach (var timer in Globals.Timers)
                 timer.Value.Dispose();
 
-            WebAppStart.Dispose();
+            _webApp.Dispose();
 
             _container.Dispose();
         }
