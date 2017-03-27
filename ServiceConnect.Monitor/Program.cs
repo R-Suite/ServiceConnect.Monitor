@@ -75,7 +75,9 @@ namespace ServiceConnect.Monitor
                 });
             });
 
-            _webApp = WebApp.Start<AuditConfig>("http://*:" + System.Configuration.ConfigurationManager.AppSettings["Port"]);
+            var webAppConfig = new AuditConfig(_container);
+
+            _webApp = WebApp.Start("http://*:" + System.Configuration.ConfigurationManager.AppSettings["Port"], app => webAppConfig.Configuration(app));
 
             var auditHub = GlobalHost.ConnectionManager.GetHubContext<AuditHub>();
             var errorHub = GlobalHost.ConnectionManager.GetHubContext<ErrorHub>();

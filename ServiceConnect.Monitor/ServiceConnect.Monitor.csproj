@@ -173,6 +173,8 @@
     <Compile Include="Repositories\SettingsRepository.cs" />
     <Compile Include="Repositories\TagRepository.cs" />
     <Compile Include="Retry.cs" />
+    <Compile Include="SmExtensions\SmWebApiDependencyResolver.cs" />
+    <Compile Include="SmExtensions\SmWebApiDependencyScope.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

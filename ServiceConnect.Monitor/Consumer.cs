@@ -78,6 +78,24 @@ namespace ServiceConnect.Monitor
                 RequestedHeartbeat = 30
             };
 
+            //if (_transportSettings.SslEnabled)
+            //{
+            //    _serverNames = _transportSettings.ServerName.Split(',');
+
+            //    connectionFactory.Ssl = new SslOption
+            //    {
+            //        Enabled = true,
+            //        AcceptablePolicyErrors = _transportSettings.AcceptablePolicyErrors,
+            //        ServerName = _serverNames[_activeHost],
+            //        CertPassphrase = _transportSettings.CertPassphrase,
+            //        CertPath = _transportSettings.CertPath,
+            //        Certs = _transportSettings.Certs,
+            //        CertificateSelectionCallback = _transportSettings.CertificateSelectionCallback,
+            //        CertificateValidationCallback = _transportSettings.CertificateValidationCallback
+            //    };
+            //    connectionFactory.Port = AmqpTcpEndpoint.DefaultAmqpSslPort;
+            //}
+
             if (!string.IsNullOrEmpty(_username))
             {
                 connectionFactory.UserName = _username;
