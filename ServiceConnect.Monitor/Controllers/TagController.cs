@@ -18,16 +18,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using ServiceConnect.Monitor.Interfaces;
-using StructureMap;
 
 namespace ServiceConnect.Monitor.Controllers
 {
     public class TagController : ApiController
     {
         private readonly ITagRepository _tagRepository;
-        public TagController()
+
+        public TagController(ITagRepository tagRepository)
         {
-            _tagRepository = ObjectFactory.GetInstance<ITagRepository>();
+            _tagRepository = tagRepository;
         }
 
         [AcceptVerbs("GET")]
@@ -36,9 +36,8 @@ namespace ServiceConnect.Monitor.Controllers
         {
             var tags = _tagRepository.Find();
             if (!string.IsNullOrEmpty(query))
-            {
                 tags = tags.Where(x => x.Name.ToLower().Contains(query.ToLower())).ToList();
-            }
+
             return tags.OrderBy(x => x.Name).Select(x => x.Name).ToList();
         }
     }
