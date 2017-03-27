@@ -54,9 +54,12 @@ namespace ServiceConnect.Monitor
             }
         }
 
+        private static IContainer _container;
+        
+
         private static void Start(string[] args)
         {
-            ObjectFactory.Initialize(x =>
+            _container = new Container(x =>
             {
                 x.For<IAuditRepository>().Use<AuditRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
                 x.For<IErrorRepository>().Use<ErrorRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
@@ -66,6 +69,7 @@ namespace ServiceConnect.Monitor
                 x.For<IHeartbeatRepository>().Use<HeartbeatRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
                 x.For<ITagRepository>().Use<TagRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
                 x.For<ISettingsRepository>().Use<SettingsRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
+
                 x.Scan(scan =>
                 {
                     scan.TheCallingAssembly();
@@ -79,7 +83,7 @@ namespace ServiceConnect.Monitor
             var errorHub = GlobalHost.ConnectionManager.GetHubContext<ErrorHub>();
             var heartbeatHub = GlobalHost.ConnectionManager.GetHubContext<HeartbeatHub>();
 
-            var settingsRepository  = ObjectFactory.GetInstance<ISettingsRepository>();
+            var settingsRepository  = _container.GetInstance<ISettingsRepository>();
             var settings = settingsRepository.Get();
             if (settings == null)
             {
@@ -96,14 +100,14 @@ namespace ServiceConnect.Monitor
 
             Globals.Settings = settings;
             
-            foreach (Models.Environment environment in settings.Environments)
+            foreach (var environment in settings.Environments)
             {
                 var consumerEnvironment = new ConsumerEnvironment
                 {
                     Server = environment.Server,
-                    AuditMessageHandler = new AuditMessageHandler(ObjectFactory.GetInstance<IAuditRepository>(), auditHub),
-                    ErrorMessageHandler = new ErrorMessageHandler(ObjectFactory.GetInstance<IErrorRepository>(), errorHub),
-                    HeartbeatMessageHandler = new HearbeatMessageHandler(ObjectFactory.GetInstance<IHeartbeatRepository>(), heartbeatHub),
+                    AuditMessageHandler = new AuditMessageHandler(_container.GetInstance<IAuditRepository>(), auditHub),
+                    ErrorMessageHandler = new ErrorMessageHandler(_container.GetInstance<IErrorRepository>(), errorHub),
+                    HeartbeatMessageHandler = new HearbeatMessageHandler(_container.GetInstance<IHeartbeatRepository>(), heartbeatHub),
                     AuditConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
                     ErrorConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
                     HeartbeatConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
@@ -112,19 +116,15 @@ namespace ServiceConnect.Monitor
                 string forwardErrorQueue = null;
                 string forwardAuditQueue = null;
                 string forwardHeartbeatQueue = null;
-               
+
                 if (settings.ForwardAudit)
-                {
                     forwardAuditQueue = settings.ForwardAuditQueue;
-                }
+
                 if (settings.ForwardErrors)
-                {
                     forwardErrorQueue = settings.ForwardErrorQueue;
-                }
+
                 if (settings.ForwardHeartbeats)
-                {
                     forwardHeartbeatQueue = settings.ForwardHeartbeatQueue;
-                }
 
                 consumerEnvironment.AuditConsumer.StartConsuming(consumerEnvironment.AuditMessageHandler.Execute, environment.AuditQueue, forwardAuditQueue);
                 consumerEnvironment.ErrorConsumer.StartConsuming(consumerEnvironment.ErrorMessageHandler.Execute, environment.ErrorQueue, forwardErrorQueue);
@@ -143,51 +143,37 @@ namespace ServiceConnect.Monitor
             timer = new Timer(HeartbeatCallback, settings, 0, 3600000);
             Globals.Timers["Heartbeat"] = timer;
 
-            var auditRepository = ObjectFactory.GetInstance<IAuditRepository>();
-            auditRepository.EnsureIndex();
-            var errorRepository = ObjectFactory.GetInstance<IErrorRepository>();
-            errorRepository.EnsureIndex();
-            var heartbeatRepository = ObjectFactory.GetInstance<IHeartbeatRepository>();
-            heartbeatRepository.EnsureIndex();
-            var serviceMessageRepository = ObjectFactory.GetInstance<IServiceMessageRepository>();
-            serviceMessageRepository.EnsureIndex();
-            var serviceRepository = ObjectFactory.GetInstance<IServiceRepository>();
-            serviceRepository.EnsureIndex();
+            _container.GetInstance<IAuditRepository>().EnsureIndex();
+            _container.GetInstance<IErrorRepository>().EnsureIndex();
+            _container.GetInstance<IHeartbeatRepository>().EnsureIndex();
+            _container.GetInstance<IServiceMessageRepository>().EnsureIndex();
+            _container.GetInstance<IServiceRepository>().EnsureIndex();
         }
 
         private static void AuditCallback(object state)
         {
             var period = Globals.AuditExpiry;
             if (!string.IsNullOrEmpty(period) && period != "Forever")
-            {
-                var repository = ObjectFactory.GetInstance<IAuditRepository>();
-                repository.Remove(DateTime.Now.AddDays(Convert.ToInt32(period) * -1));
-            }
+                _container.GetInstance<IAuditRepository>().Remove(DateTime.Now.AddDays(Convert.ToInt32(period) * -1));
         }
 
         private static void ErrorCallback(object state)
         {
             var period = Globals.ErrorExpiry;
             if (!string.IsNullOrEmpty(period) && period != "Forever")
-            {
-                var repository = ObjectFactory.GetInstance<IErrorRepository>();
-                repository.Remove(DateTime.Now.AddDays(Convert.ToInt32(period) * -1));
-            }
+                _container.GetInstance<IErrorRepository>().Remove(DateTime.Now.AddDays(Convert.ToInt32(period) * -1));
         }
 
         private static void HeartbeatCallback(object state)
         {
             var period = Globals.HeartbeatExpiry;
             if (!string.IsNullOrEmpty(period) && period != "Forever")
-            {
-                var repository = ObjectFactory.GetInstance<IHeartbeatRepository>();
-                repository.Remove(DateTime.Now.AddDays(Convert.ToInt32(period) * -1));
-            }
+                _container.GetInstance<IHeartbeatRepository>().Remove(DateTime.Now.AddDays(Convert.ToInt32(period) * -1));
         }
 
         private static void Stop()
         {
-            foreach (ConsumerEnvironment environment in Globals.Environments)
+            foreach (var environment in Globals.Environments)
             {
                 environment.AuditMessageHandler.Dispose();
                 environment.ErrorMessageHandler.Dispose();
@@ -198,11 +184,11 @@ namespace ServiceConnect.Monitor
             }
 
             foreach (var timer in Globals.Timers)
-            {
                 timer.Value.Dispose();
-            }
 
             WebAppStart.Dispose();
+
+            _container.Dispose();
         }
     }
 }
