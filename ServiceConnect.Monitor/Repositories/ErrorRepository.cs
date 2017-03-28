@@ -30,12 +30,9 @@ namespace ServiceConnect.Monitor.Repositories
     {
         private readonly MongoCollection<Error> _errorCollection;
 
-        public ErrorRepository(string mongoConnectionString)
+        public ErrorRepository(IMongoRepository mongoRepository, string errorCollectionName)
         {
-            var mongoClient = new MongoClient(mongoConnectionString);
-            MongoServer server = mongoClient.GetServer();
-            var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
-            _errorCollection = mongoDatabase.GetCollection<Error>("Error");
+            _errorCollection = mongoRepository.Database.GetCollection<Error>(errorCollectionName);
         }
 
         public void InsertError(Error model)

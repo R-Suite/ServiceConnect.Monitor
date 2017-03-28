@@ -110,9 +110,9 @@ namespace ServiceConnect.Monitor.Controllers
                         ErrorMessageHandler = new ErrorMessageHandler(_errorRepository, errorHub),
                         HeartbeatMessageHandler = new HearbeatMessageHandler(_heartbeatRepository, heartbeatHub),
 
-                        AuditConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
-                        ErrorConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
-                        HeartbeatConsumer = new Consumer(environment.Server, environment.Username, environment.Password)
+                        AuditConsumer = new Consumer(environment),
+                        ErrorConsumer = new Consumer(environment),
+                        HeartbeatConsumer = new Consumer(environment)
                     };
 
                     string forwardErrorQueue = null;

@@ -28,12 +28,9 @@ namespace ServiceConnect.Monitor.Repositories
     {
         private readonly MongoCollection<ServiceMessage> _serviceMessagesCollection;
 
-        public ServiceMessageRepository(string mongoConnectionString)
+        public ServiceMessageRepository(IMongoRepository mongoRepository, string serviceMessagesCollectionName)
         {
-            var mongoClient = new MongoClient(mongoConnectionString);
-            MongoServer server = mongoClient.GetServer();
-            var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
-            _serviceMessagesCollection = mongoDatabase.GetCollection<ServiceMessage>("ServiceMessages");
+            _serviceMessagesCollection = mongoRepository.Database.GetCollection<ServiceMessage>(serviceMessagesCollectionName);
         }
 
         public IList<ServiceMessage> Find()

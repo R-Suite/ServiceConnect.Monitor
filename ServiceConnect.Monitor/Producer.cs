@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Security;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+using Environment = ServiceConnect.Monitor.Models.Environment;
 
 namespace ServiceConnect.Monitor
 {
@@ -14,29 +17,37 @@ namespace ServiceConnect.Monitor
         private IConnection _connection;
         private readonly Object _lock = new Object();
         private readonly ConnectionFactory _connectionFactory;
-        private readonly string _host;
 
-        public Producer(string host, string username, string password)
+        public Producer(Environment environment)
         {           
-            _host = host;            
-
             _connectionFactory = new ConnectionFactory
             {
-                HostName = _host,
+                HostName = environment.Server,
                 VirtualHost = "/",
                 Protocol = Protocols.DefaultProtocol,
                 Port = AmqpTcpEndpoint.UseDefaultPort
             };
 
-            if (!string.IsNullOrEmpty(username))
+            if (environment.SslEnabled)
             {
-                _connectionFactory.UserName = username;
+                _connectionFactory.Ssl = new SslOption
+                {
+                    Enabled = true,
+                    AcceptablePolicyErrors = SslPolicyErrors.None,
+                    ServerName = environment.Server,
+                    CertPassphrase = environment.CertPassword,
+                    Certs = new X509Certificate2Collection { new X509Certificate2(Convert.FromBase64String(environment.CertBase64), environment.CertPassword) },
+                    CertificateSelectionCallback = null,
+                    CertificateValidationCallback = null
+                };
+                _connectionFactory.Port = AmqpTcpEndpoint.DefaultAmqpSslPort;
             }
 
-            if (!string.IsNullOrEmpty(password))
-            {
-                _connectionFactory.Password = password;
-            }
+            if (!string.IsNullOrEmpty(environment.Username))
+                _connectionFactory.UserName = environment.Username;
+
+            if (!string.IsNullOrEmpty(environment.Password))
+                _connectionFactory.Password = environment.Password;
 
             CreateConnection();
         }
@@ -53,7 +64,7 @@ namespace ServiceConnect.Monitor
 
             lock (_lock)
             {
-                IBasicProperties basicProperties = _model.CreateBasicProperties();
+                var basicProperties = _model.CreateBasicProperties();
                 basicProperties.SetPersistent(true);
 
                 basicProperties.Headers = headers.ToDictionary(x => x.Key, x => (object)x.Value);
@@ -70,6 +81,7 @@ namespace ServiceConnect.Monitor
                 _connection.Close();
                 _connection.Dispose();
             }
+
             if (_model != null)
             {
                 _model.Abort();
