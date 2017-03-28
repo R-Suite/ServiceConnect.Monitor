@@ -29,12 +29,9 @@ namespace ServiceConnect.Monitor.Repositories
     {
         private readonly MongoCollection<Service> _serviceCollection;
 
-        public ServiceRepository(string mongoConnectionString)
+        public ServiceRepository(IMongoRepository mongoRepository, string servicesCollectionName)
         {
-            var mongoClient = new MongoClient(mongoConnectionString);
-            MongoServer server = mongoClient.GetServer();
-            var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
-            _serviceCollection = mongoDatabase.GetCollection<Service>("Services");
+            _serviceCollection = mongoRepository.Database.GetCollection<Service>(servicesCollectionName);
         }
 
         public void EnsureIndex()

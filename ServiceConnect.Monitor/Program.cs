@@ -59,14 +59,39 @@ namespace ServiceConnect.Monitor
         {
             _container = new Container(x =>
             {
-                x.For<IAuditRepository>().Use<AuditRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
-                x.For<IErrorRepository>().Use<ErrorRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
-                x.For<IHeartbeatRepository>().Use<HeartbeatRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
-                x.For<IServiceRepository>().Use<ServiceRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
-                x.For<IServiceMessageRepository>().Use<ServiceMessageRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
-                x.For<IHeartbeatRepository>().Use<HeartbeatRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
-                x.For<ITagRepository>().Use<TagRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
-                x.For<ISettingsRepository>().Use<SettingsRepository>().Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["ConnectionString"]);
+                x.For<IMongoRepository>().Singleton().Use<MongoRepository>()
+                    .Ctor<string>("mongoConnectionString").Is(System.Configuration.ConfigurationManager.AppSettings["MongoDBConnectionString"])
+                    .Ctor<string>("mongoUsername").Is(System.Configuration.ConfigurationManager.AppSettings["MongoDBUsername"])
+                    .Ctor<string>("mongoPassword").Is(System.Configuration.ConfigurationManager.AppSettings["MongoDBPassword"])
+                    .Ctor<string>("certBase64").Is(System.Configuration.ConfigurationManager.AppSettings["MongoCertBase64"])
+                    .Ctor<string>("databaseName").Is(System.Configuration.ConfigurationManager.AppSettings["PersistanceDatabaseName"]);
+
+                x.For<IAuditRepository>().Use<AuditRepository>()
+                    .Ctor<string>("auditCollecitonName").Is(System.Configuration.ConfigurationManager.AppSettings["PersistanceCollectionNameAudit"])
+                    .Ctor<string>("serviceMessagesCollectionName").Is(System.Configuration.ConfigurationManager.AppSettings["ServiceMessagesCollectionName"]);
+
+                x.For<IErrorRepository>().Use<ErrorRepository>()
+                    .Ctor<string>("errorCollectionName").Is(System.Configuration.ConfigurationManager.AppSettings["PersistanceCollectionNameError"]);
+
+                x.For<IHeartbeatRepository>().Use<HeartbeatRepository>()
+                    .Ctor<string>("heartbeatCollectionName").Is(System.Configuration.ConfigurationManager.AppSettings["PersistanceCollectionNameHeartbeat"])
+                    .Ctor<string>("servicesCollectionName").Is(System.Configuration.ConfigurationManager.AppSettings["ServiceDetailsCollectionName"]);
+
+                x.For<IServiceRepository>().Use<ServiceRepository>()
+                    .Ctor<string>("servicesCollectionName").Is(System.Configuration.ConfigurationManager.AppSettings["ServiceDetailsCollectionName"]);
+
+                x.For<IServiceMessageRepository>().Use<ServiceMessageRepository>()
+                    .Ctor<string>("serviceMessagesCollectionName").Is(System.Configuration.ConfigurationManager.AppSettings["ServiceMessagesCollectionName"]);
+
+                x.For<IHeartbeatRepository>().Use<HeartbeatRepository>()
+                    .Ctor<string>("heartbeatCollectionName").Is(System.Configuration.ConfigurationManager.AppSettings["PersistanceCollectionNameHeartbeat"])
+                    .Ctor<string>("serviceCollectionName").Is(System.Configuration.ConfigurationManager.AppSettings["ServiceDetailsCollectionName"]);
+
+                x.For<ITagRepository>().Use<TagRepository>()
+                    .Ctor<string>("tagCollectionName").Is(System.Configuration.ConfigurationManager.AppSettings["TagsCollectionName"]);
+
+                x.For<ISettingsRepository>().Use<SettingsRepository>()
+                    .Ctor<string>("settingsCollectionName").Is(System.Configuration.ConfigurationManager.AppSettings["SettingsCollectionName"]);
 
                 x.Scan(scan =>
                 {
@@ -108,10 +133,10 @@ namespace ServiceConnect.Monitor
                     AuditMessageHandler = new AuditMessageHandler(_container.GetInstance<IAuditRepository>(), auditHub),
                     ErrorMessageHandler = new ErrorMessageHandler(_container.GetInstance<IErrorRepository>(), errorHub),
                     HeartbeatMessageHandler = new HearbeatMessageHandler(_container.GetInstance<IHeartbeatRepository>(), heartbeatHub),
-                    AuditConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
-                    ErrorConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
-                    HeartbeatConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
-                    Producer = new Producer(environment.Server, environment.Username, environment.Password)
+                    AuditConsumer = new Consumer(environment),
+                    ErrorConsumer = new Consumer(environment),
+                    HeartbeatConsumer = new Consumer(environment),
+                    Producer = new Producer(environment)
                 };
                 string forwardErrorQueue = null;
                 string forwardAuditQueue = null;
