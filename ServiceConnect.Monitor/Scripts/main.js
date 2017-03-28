@@ -26,6 +26,7 @@ require.config({
         'backgrid': 'bower_components/backgrid/lib/backgrid',
         'select2': 'bower_components/select2/select2',
         'backbone-pageable': 'bower_components/backbone-pageable/lib/backbone-pageable',
+        'backbone.paginator': 'bower_components/backbone.paginator/lib/backbone.paginator',
         'backgrid-filter': 'bower_components/backgrid-filter/backgrid-filter',
         'backgrid-paginator': 'bower_components/backgrid-paginator/backgrid-paginator',
         'moment': "bower_components/moment/moment",
