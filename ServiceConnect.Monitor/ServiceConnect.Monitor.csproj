@@ -168,6 +168,8 @@
     <Compile Include="Repositories\AuditRepository.cs" />
     <Compile Include="Repositories\ErrorRepository.cs" />
     <Compile Include="Repositories\HeartbeatRepository.cs" />
+    <Compile Include="Interfaces\IMongoRepository.cs" />
+    <Compile Include="Repositories\MongoRepository.cs" />
     <Compile Include="Repositories\ServiceMessageRepository.cs" />
     <Compile Include="Repositories\ServiceRepository.cs" />
     <Compile Include="Repositories\SettingsRepository.cs" />
