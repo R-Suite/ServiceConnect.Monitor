@@ -47,7 +47,7 @@ namespace ServiceConnect.Monitor.Controllers
 
             var services = _serviceRepository.Find().Where(x => tagList == null || tagList.Any(y => x.Tags != null && x.Tags.Contains(y))).OrderBy(x => x.Name).ToList();
             foreach (var service in services)
-                service.Status = service.LastHeartbeat < DateTime.Now.Subtract(new TimeSpan(0, 0, 35)) ? "Red" : "Green";
+                service.Status = service.LastHeartbeat < DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 35)) ? "Red" : "Green";
 
             return services;
         }
