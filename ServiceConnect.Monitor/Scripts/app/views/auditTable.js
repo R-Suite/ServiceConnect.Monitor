@@ -42,7 +42,7 @@ define(['backbone',
                 name: "Time Sent",
                 field: "TimeSent",
                 formatter: function(row, col, val, colDefinition, model) {
-                    return moment.utc(val).format("DD/MM/YYYY HH:mm:ss.SSS");
+                    return moment.utc(val).local().format("DD/MM/YYYY HH:mm:ss.SSS");
                 },
                 width: 100
             }, {
