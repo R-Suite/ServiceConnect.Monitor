@@ -24,12 +24,9 @@ namespace ServiceConnect.Monitor.Repositories
     {
         private readonly MongoCollection<Settings> _settingsRepository;
 
-        public SettingsRepository(string mongoConnectionString)
+        public SettingsRepository(IMongoRepository mongoRepository, string settingsCollectionName)
         {
-            var mongoClient = new MongoClient(mongoConnectionString);
-            MongoServer server = mongoClient.GetServer();
-            var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
-            _settingsRepository = mongoDatabase.GetCollection<Settings>("Settings");
+            _settingsRepository = mongoRepository.Database.GetCollection<Settings>(settingsCollectionName);
         }
         
         public Settings Get()

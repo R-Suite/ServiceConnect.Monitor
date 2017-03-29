@@ -32,7 +32,7 @@ define(['backbone',
             editable: false,
             formatter: _.extend({}, Backgrid.CellFormatter.prototype, {
                 fromRaw: function(rawValue) {
-                    return moment.utc(rawValue).format("DD/MM/YYYY HH:mm:ss");
+                    return moment.utc(rawValue).local().format("DD/MM/YYYY HH:mm:ss");
                 }
             })
         }, {

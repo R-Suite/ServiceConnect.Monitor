@@ -21,7 +21,6 @@ using System.Web.Http;
 using MongoDB.Bson;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
-using StructureMap;
 
 namespace ServiceConnect.Monitor.Controllers
 {
@@ -30,10 +29,10 @@ namespace ServiceConnect.Monitor.Controllers
         private readonly IAuditRepository _auditRepository;
         private readonly IServiceRepository _serviceRepository;
 
-        public AuditController()
+        public AuditController(IAuditRepository auditRepository, IServiceRepository serviceRepository)
         {
-            _auditRepository = ObjectFactory.GetInstance<IAuditRepository>();
-            _serviceRepository = ObjectFactory.GetInstance<IServiceRepository>();
+            _auditRepository = auditRepository;
+            _serviceRepository = serviceRepository;
         }
 
         [AcceptVerbs("GET")]
@@ -49,9 +48,7 @@ namespace ServiceConnect.Monitor.Controllers
         {
             List<string> tagList = null;
             if (!string.IsNullOrEmpty(tags))
-            {
                 tagList = tags.Split(',').ToList();
-            }
 
             var audits = _auditRepository.Find(from, to);
 
@@ -61,13 +58,11 @@ namespace ServiceConnect.Monitor.Controllers
 
                 var services = _serviceRepository.Find();
 
-                foreach (Audit audit in audits)
+                foreach (var audit in audits)
                 {
-                    bool match = services.Any(service => (audit.SourceAddress == service.Name || audit.DestinationAddress == service.Name) && service.Tags != null && service.Tags.Any(tagList.Contains));
+                    var match = services.Any(service => (audit.SourceAddress == service.Name || audit.DestinationAddress == service.Name) && service.Tags != null && service.Tags.Any(tagList.Contains));
                     if (match)
-                    {
                         results.Add(audit);
-                    }
                 }
 
                 return results;

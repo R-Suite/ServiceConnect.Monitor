@@ -22,17 +22,22 @@ using ServiceConnect.Monitor.Handlers;
 using ServiceConnect.Monitor.Hubs;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
-using StructureMap;
 
 namespace ServiceConnect.Monitor.Controllers
 {
     public class SettingsController : ApiController
     {
         private readonly ISettingsRepository _settingsRepository;
+        private readonly IAuditRepository _auditRepository;
+        private readonly IErrorRepository _errorRepository;
+        private readonly IHeartbeatRepository _heartbeatRepository;
 
-        public SettingsController()
+        public SettingsController(ISettingsRepository settingsRepository, IAuditRepository auditRepository, IErrorRepository errorRepository, IHeartbeatRepository heartbeatRepository)
         {
-            _settingsRepository = ObjectFactory.GetInstance<ISettingsRepository>();
+            _settingsRepository = settingsRepository;
+            _auditRepository = auditRepository;
+            _errorRepository = errorRepository;
+            _heartbeatRepository = heartbeatRepository;
         }
 
         [AcceptVerbs("GET")]
@@ -47,64 +52,39 @@ namespace ServiceConnect.Monitor.Controllers
         public Settings UpdateSettings(Settings model)
         {
             if (string.IsNullOrEmpty(model.KeepAuditsFor))
-            {
                 model.KeepAuditsFor = "Forever";
-            }
+
             if (string.IsNullOrEmpty(model.KeepErrorsFor))
-            {
                 model.KeepErrorsFor = "Forever";
-            }
+
             if (string.IsNullOrEmpty(model.KeepHeartbeatsFor))
-            {
                 model.KeepHeartbeatsFor = "Forever";
-            }
 
             _settingsRepository.Update(model);
 
             if (model.ForwardAudit == false)
-            {
-                foreach (ConsumerEnvironment consumerEnvironment in Globals.Environments)
-                {
+                foreach (var consumerEnvironment in Globals.Environments)
                     consumerEnvironment.AuditConsumer.SetForwardQueue(null);
-                }
-            }
+
             if (Globals.Settings.ForwardAuditQueue != model.ForwardAuditQueue)
-            {
-                foreach (ConsumerEnvironment consumerEnvironment in Globals.Environments)
-                {
+                foreach (var consumerEnvironment in Globals.Environments)
                     consumerEnvironment.AuditConsumer.SetForwardQueue(model.ForwardAuditQueue);
-                }
-            }
 
             if (model.ForwardErrors == false)
-            {
-                foreach (ConsumerEnvironment consumerEnvironment in Globals.Environments)
-                {
+                foreach (var consumerEnvironment in Globals.Environments)
                     consumerEnvironment.ErrorConsumer.SetForwardQueue(null);
-                }
-            }
+
             if (Globals.Settings.ForwardErrorQueue != model.ForwardErrorQueue)
-            {
-                foreach (ConsumerEnvironment consumerEnvironment in Globals.Environments)
-                {
+                foreach (var consumerEnvironment in Globals.Environments)
                     consumerEnvironment.ErrorConsumer.SetForwardQueue(model.ForwardErrorQueue);
-                }
-            }
 
             if (model.ForwardHeartbeats == false)
-            {
-                foreach (ConsumerEnvironment consumerEnvironment in Globals.Environments)
-                {
+                foreach (var consumerEnvironment in Globals.Environments)
                     consumerEnvironment.HeartbeatConsumer.SetForwardQueue(null);
-                }
-            }
+
             if (Globals.Settings.ForwardHeartbeatQueue != model.ForwardHeartbeatQueue)
-            {
-                foreach (ConsumerEnvironment consumerEnvironment in Globals.Environments)
-                {
+                foreach (var consumerEnvironment in Globals.Environments)
                     consumerEnvironment.HeartbeatConsumer.SetForwardQueue(model.ForwardHeartbeatQueue);
-                }
-            }
 
             Globals.Settings = model;
 
@@ -113,7 +93,7 @@ namespace ServiceConnect.Monitor.Controllers
             var heartbeatHub = GlobalHost.ConnectionManager.GetHubContext<HeartbeatHub>();
 
             var environments = Globals.Environments;
-            foreach (Environment environment in model.Environments)
+            foreach (var environment in model.Environments)
             {
                 var consumerEnvironment = environments.FirstOrDefault(x => x.Server == environment.Server &&
                                                                            x.Username == environment.Username &&
@@ -126,29 +106,27 @@ namespace ServiceConnect.Monitor.Controllers
                     consumerEnvironment = new ConsumerEnvironment
                     {
                         Server = environment.Server,
-                        AuditMessageHandler = new AuditMessageHandler(ObjectFactory.GetInstance<IAuditRepository>(), auditHub),
-                        ErrorMessageHandler = new ErrorMessageHandler(ObjectFactory.GetInstance<IErrorRepository>(), errorHub),
-                        HeartbeatMessageHandler = new HearbeatMessageHandler(ObjectFactory.GetInstance<IHeartbeatRepository>(), heartbeatHub),
-                        AuditConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
-                        ErrorConsumer = new Consumer(environment.Server, environment.Username, environment.Password),
-                        HeartbeatConsumer = new Consumer(environment.Server, environment.Username, environment.Password)
+                        AuditMessageHandler = new AuditMessageHandler(_auditRepository, auditHub),
+                        ErrorMessageHandler = new ErrorMessageHandler(_errorRepository, errorHub),
+                        HeartbeatMessageHandler = new HearbeatMessageHandler(_heartbeatRepository, heartbeatHub),
+
+                        AuditConsumer = new Consumer(environment),
+                        ErrorConsumer = new Consumer(environment),
+                        HeartbeatConsumer = new Consumer(environment)
                     };
+
                     string forwardErrorQueue = null;
                     string forwardAuditQueue = null;
                     string forwardHeartbeatQueue = null;
 
                     if (Globals.Settings.ForwardAudit)
-                    {
                         forwardAuditQueue = Globals.Settings.ForwardAuditQueue;
-                    }
+
                     if (Globals.Settings.ForwardErrors)
-                    {
                         forwardErrorQueue = Globals.Settings.ForwardErrorQueue;
-                    }
+
                     if (Globals.Settings.ForwardHeartbeats)
-                    {
                         forwardHeartbeatQueue = Globals.Settings.ForwardHeartbeatQueue;
-                    }
 
                     consumerEnvironment.AuditConsumer.StartConsuming(consumerEnvironment.AuditMessageHandler.Execute, environment.AuditQueue, forwardAuditQueue);
                     consumerEnvironment.ErrorConsumer.StartConsuming(consumerEnvironment.ErrorMessageHandler.Execute, environment.ErrorQueue, forwardErrorQueue);
@@ -157,7 +135,7 @@ namespace ServiceConnect.Monitor.Controllers
             }
 
             var environmentsToRemove = new List<ConsumerEnvironment>();
-            foreach (ConsumerEnvironment consumerEnvironment in environments)
+            foreach (var consumerEnvironment in environments)
             {
                 var environment = model.Environments.FirstOrDefault(x => x.Server == consumerEnvironment.Server &&
                                                                            x.Username == consumerEnvironment.Username &&
@@ -166,12 +144,10 @@ namespace ServiceConnect.Monitor.Controllers
                                                                            x.ErrorQueue == consumerEnvironment.ErrorQueue &&
                                                                            x.HeartbeatQueue == consumerEnvironment.HeartbeatQueue);
                 if (environment == null)
-                {
                     environmentsToRemove.Add(consumerEnvironment);
-                }
             }
 
-            foreach (ConsumerEnvironment consumerEnvironment in environmentsToRemove)
+            foreach (var consumerEnvironment in environmentsToRemove)
             {
                 consumerEnvironment.AuditConsumer.Dispose();
                 consumerEnvironment.ErrorConsumer.Dispose();
