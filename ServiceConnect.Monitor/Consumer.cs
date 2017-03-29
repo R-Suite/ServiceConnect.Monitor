@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using log4net;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using Environment = ServiceConnect.Monitor.Models.Environment;
 
 namespace ServiceConnect.Monitor
 {
@@ -11,22 +14,21 @@ namespace ServiceConnect.Monitor
 
     public class Consumer : IDisposable
     {
-        private readonly string _host;
-        private readonly string _username;
-        private readonly string _password;
         private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private readonly Environment _environment;
         private IConnection _connection;
         private IModel _model;
+
         private ConsumerEventHandler _consumerEventHandler;
+
         private string _queueName;
         private bool _connectionClosed;
         private string _forwardQueue;
 
-        public Consumer(string host, string username, string password)
+        public Consumer(Environment environment)
         {
-            _host = host;
-            _username = username;
-            _password = password;
+            _environment = environment;
         }
 
         /// <summary>
@@ -48,12 +50,10 @@ namespace ServiceConnect.Monitor
 
             string message = Encoding.UTF8.GetString(args.Body);
 
-            _consumerEventHandler(message, headers, _host);
+            _consumerEventHandler(message, headers, _environment.Server);
 
             if (!string.IsNullOrEmpty(_forwardQueue))
-            {
                 _model.BasicPublish(string.Empty, _forwardQueue, args.BasicProperties, args.Body);
-            }
 
             _model.BasicAck(args.DeliveryTag, false);
         }
@@ -63,6 +63,7 @@ namespace ServiceConnect.Monitor
             _consumerEventHandler = messageReceived;
             _queueName = queueName;
             _forwardQueue = forwardQueue;
+
             CreateConsumer();
         }
 
@@ -72,21 +73,32 @@ namespace ServiceConnect.Monitor
 
             var connectionFactory = new ConnectionFactory
             {
-                HostName = _host,
+                HostName = _environment.Server,
                 Protocol = Protocols.DefaultProtocol,
                 Port = AmqpTcpEndpoint.UseDefaultPort,
                 RequestedHeartbeat = 30
             };
 
-            if (!string.IsNullOrEmpty(_username))
+            if (_environment.SslEnabled)
             {
-                connectionFactory.UserName = _username;
+                connectionFactory.Ssl = new SslOption
+                {
+                    Enabled = true,
+                    AcceptablePolicyErrors = SslPolicyErrors.None,
+                    ServerName = _environment.Server,
+                    CertPassphrase = _environment.CertPassword,
+                    Certs = new X509Certificate2Collection { new X509Certificate2(Convert.FromBase64String(_environment.CertBase64), _environment.CertPassword) },
+                    CertificateSelectionCallback = null,
+                    CertificateValidationCallback = null
+                };
+                connectionFactory.Port = AmqpTcpEndpoint.DefaultAmqpSslPort;
             }
 
-            if (!string.IsNullOrEmpty(_password))
-            {
-                connectionFactory.Password = _password;
-            }
+            if (!string.IsNullOrEmpty(_environment.Username))
+                connectionFactory.UserName = _environment.Username;
+
+            if (!string.IsNullOrEmpty(_environment.Password))
+                connectionFactory.Password = _environment.Password;
 
             _connection = connectionFactory.CreateConnection();
 
@@ -95,9 +107,7 @@ namespace ServiceConnect.Monitor
             var queueName = ConfigureQueue(_queueName);
 
             if (_forwardQueue != null)
-            {
                 ConfigureQueue(_forwardQueue);
-            }
 
             var consumer = new EventingBasicConsumer(_model);
             consumer.Received += Event;
@@ -109,17 +119,13 @@ namespace ServiceConnect.Monitor
         {
             _forwardQueue = queue;
             if (_forwardQueue != null)
-            {
                 ConfigureQueue(_forwardQueue);
-            }
         }
 
         private void ConsumerShutdown(object sender, ShutdownEventArgs e)
         {
             if (_connectionClosed)
-            {
                 return;
-            }
 
             Retry.Do(CreateConsumer, ex => Logger.Error("Error connecting to queue - {0}", ex), new TimeSpan(0, 0, 0, 10));
         }
@@ -137,11 +143,6 @@ namespace ServiceConnect.Monitor
             return queue;
         }
 
-        public void StopConsuming()
-        {
-            Dispose();
-        }
-
         public void Dispose()
         {
             if (_connection != null)
@@ -149,6 +150,7 @@ namespace ServiceConnect.Monitor
                 _connectionClosed = true;
                 _connection.Close(500);
             }
+
             if (_model != null)
                 _model.Abort();
         }

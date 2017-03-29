@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Web.Http;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
-using StructureMap;
 
 namespace ServiceConnect.Monitor.Controllers
 {
@@ -26,9 +25,9 @@ namespace ServiceConnect.Monitor.Controllers
     {
         private readonly IServiceMessageRepository _serviceMessageRepository;
 
-        public ServiceMessageController()
+        public ServiceMessageController(IServiceMessageRepository serviceMessageRepository)
         {
-            _serviceMessageRepository = ObjectFactory.GetInstance<IServiceMessageRepository>();
+            _serviceMessageRepository = serviceMessageRepository;
         }
 
         [AcceptVerbs("GET")]

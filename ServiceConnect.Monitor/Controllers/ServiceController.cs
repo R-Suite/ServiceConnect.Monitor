@@ -21,7 +21,6 @@ using System.Web.Http;
 using MongoDB.Bson;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
-using StructureMap;
 
 namespace ServiceConnect.Monitor.Controllers
 {
@@ -31,62 +30,45 @@ namespace ServiceConnect.Monitor.Controllers
         private readonly ITagRepository _tagRepository;
         private readonly IHeartbeatRepository _heartbeatRepository;
 
-        public ServiceController()
+        public ServiceController(IServiceRepository serviceRepository, ITagRepository tagRepository, IHeartbeatRepository heartbeatRepository)
         {
-            _serviceRepository = ObjectFactory.GetInstance<IServiceRepository>();
-            _tagRepository = ObjectFactory.GetInstance<ITagRepository>();
-            _heartbeatRepository = ObjectFactory.GetInstance<IHeartbeatRepository>();
+            _serviceRepository = serviceRepository;
+            _tagRepository = tagRepository;
+            _heartbeatRepository = heartbeatRepository;
         }
 
-        [System.Web.Http.AcceptVerbs("GET")]
+        [AcceptVerbs("GET")]
         [Route("services")]
         public IList<Service> FindServices(string tags = null)
         {
             List<string> tagList = null;
             if (!string.IsNullOrEmpty(tags))
-            {
                 tagList = tags.Split(',').ToList();
-            }
 
             var services = _serviceRepository.Find().Where(x => tagList == null || tagList.Any(y => x.Tags != null && x.Tags.Contains(y))).OrderBy(x => x.Name).ToList();
-            foreach (Service service in services)
-            {
-                if (service.LastHeartbeat < DateTime.Now.Subtract(new TimeSpan(0, 0, 35)))
-                {
-                    service.Status = "Red";
-                }
-                else
-                {
-                    service.Status = "Green"; 
-                }
-            }
+            foreach (var service in services)
+                service.Status = service.LastHeartbeat < DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 35)) ? "Red" : "Green";
 
             return services;
         }
 
-        [System.Web.Http.AcceptVerbs("GET")]
+        [AcceptVerbs("GET")]
         [Route("service")]
         public Service FindService(string name, string location)
         {
             return _serviceRepository.Find(name, location);
         }
 
-        [System.Web.Http.AcceptVerbs("PUT")]
+        [AcceptVerbs("PUT")]
         [Route("service/{id}")]
         public Service UpdateService(Service model)
         {
             var tags = _tagRepository.Find().Select(x => x.Name).ToList();
             var modelTags = model.Tags;
             if (modelTags != null)
-            {
-                foreach (string modelTag in modelTags)
-                {
+                foreach (var modelTag in modelTags)
                     if (!tags.Contains(modelTag))
-                    {
                         _tagRepository.Insert(modelTag);
-                    }
-                }
-            }
 
             var service = _serviceRepository.Find(model.Name, model.InstanceLocation);
             service.Tags = model.Tags;
@@ -95,24 +77,22 @@ namespace ServiceConnect.Monitor.Controllers
             return model;
         }
 
-        [System.Web.Http.AcceptVerbs("DELETE")]
+        [AcceptVerbs("DELETE")]
         [Route("service/{id}")]
         public void DeleteService(string id)
         {
-            Service service = _serviceRepository.Get(new ObjectId(id));
+            var service = _serviceRepository.Get(new ObjectId(id));
             _serviceRepository.Delete(new ObjectId(id));
             _heartbeatRepository.Remove(service.Name, service.InstanceLocation);
         }
 
-        [System.Web.Http.AcceptVerbs("GET")]
+        [AcceptVerbs("GET")]
         [Route("endpoints")]
         public IList<Service> FindEndpoints(string tags = null)
         {
             List<string> tagList = null;
             if (!string.IsNullOrEmpty(tags))
-            {
                 tagList = tags.Split(',').ToList();
-            }
 
             return _serviceRepository.Find().GroupBy(x => x.Name).Select(x => new Service
             {
@@ -131,15 +111,11 @@ namespace ServiceConnect.Monitor.Controllers
         private string GetStatus(List<Service> services)
         {
             if (services.All(x => x.LastHeartbeat < DateTime.Now.Subtract(new TimeSpan(0, 0, 35))))
-            {
                 return "Red";
-            }
 
             if (services.Any(x => x.LastHeartbeat < DateTime.Now.Subtract(new TimeSpan(0, 0, 35))))
-            {
                 return "Yellow";
-            }            
-            
+
             return "Green";
         }
     }

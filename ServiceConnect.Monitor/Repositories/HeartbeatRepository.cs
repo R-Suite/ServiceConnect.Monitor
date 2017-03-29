@@ -30,13 +30,10 @@ namespace ServiceConnect.Monitor.Repositories
         private readonly MongoCollection<Heartbeat> _heartbeatsCollection;
         private readonly MongoCollection<Service> _serviceCollection;
 
-        public HeartbeatRepository(string mongoConnectionString)
+        public HeartbeatRepository(IMongoRepository mongoRepository, string heartbeatCollectionName, string serviceCollectionName)
         {
-            var mongoClient = new MongoClient(mongoConnectionString);
-            MongoServer server = mongoClient.GetServer();
-            var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
-            _heartbeatsCollection = mongoDatabase.GetCollection<Heartbeat>("ServiceHeartbeats");
-            _serviceCollection = mongoDatabase.GetCollection<Service>("Services");
+            _heartbeatsCollection = mongoRepository.Database.GetCollection<Heartbeat>(heartbeatCollectionName);
+            _serviceCollection = mongoRepository.Database.GetCollection<Service>(serviceCollectionName);
         }
 
         public void InsertHeartbeat(Heartbeat model)

@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Web.Http;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
-using StructureMap;
 
 namespace ServiceConnect.Monitor.Controllers
 {
@@ -27,9 +26,9 @@ namespace ServiceConnect.Monitor.Controllers
     {
         private readonly IHeartbeatRepository _heartbeatRepository;
 
-        public HeartbeatController()
+        public HeartbeatController(IHeartbeatRepository heartbeatRepository)
         {
-            _heartbeatRepository = ObjectFactory.GetInstance<IHeartbeatRepository>();
+            _heartbeatRepository = heartbeatRepository;
         }
 
         [AcceptVerbs("GET")]

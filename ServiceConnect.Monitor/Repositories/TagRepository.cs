@@ -28,12 +28,9 @@ namespace ServiceConnect.Monitor.Repositories
     {
         private readonly MongoCollection<Tag> _tagCollection;
 
-        public TagRepository(string mongoConnectionString)
+        public TagRepository(IMongoRepository mongoRepository, string tagCollectionName)
         {
-            var mongoClient = new MongoClient(mongoConnectionString);
-            MongoServer server = mongoClient.GetServer();
-            var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
-            _tagCollection = mongoDatabase.GetCollection<Tag>("Tags");
+            _tagCollection = mongoRepository.Database.GetCollection<Tag>(tagCollectionName);
         }
 
         public List<Tag> Find()

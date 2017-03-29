@@ -43,9 +43,7 @@ namespace ServiceConnect.Monitor.Controllers
         {
             byte[] resourceByteArray;
             using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
                 resourceByteArray = ReadFully(fs);
-            }
 
             string contentType = MimeTypeMap.GetMimeType(Path.GetExtension(filename));
             var dataStream = new MemoryStream(resourceByteArray);
@@ -68,9 +66,7 @@ namespace ServiceConnect.Monitor.Controllers
             {
                 int read;
                 while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-                {
                     ms.Write(buffer, 0, read);
-                }
                 return ms.ToArray();
             }
         }

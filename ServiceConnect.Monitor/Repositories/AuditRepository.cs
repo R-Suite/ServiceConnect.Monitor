@@ -31,13 +31,10 @@ namespace ServiceConnect.Monitor.Repositories
         private readonly MongoCollection<Audit> _auditCollection;
         private readonly MongoCollection<ServiceMessage> _serviceMessagesCollection;
 
-        public AuditRepository(string mongoConnectionString)
+        public AuditRepository(IMongoRepository mongoRepository, string auditCollecitonName, string serviceMessagesCollectionName)
         {
-            var mongoClient = new MongoClient(mongoConnectionString);
-            MongoServer server = mongoClient.GetServer();
-            var mongoDatabase = server.GetDatabase("RMessageBusMonitor");
-            _auditCollection = mongoDatabase.GetCollection<Audit>("Audit");
-            _serviceMessagesCollection = mongoDatabase.GetCollection<ServiceMessage>("ServiceMessages");
+            _auditCollection = mongoRepository.Database.GetCollection<Audit>(auditCollecitonName);
+            _serviceMessagesCollection = mongoRepository.Database.GetCollection<ServiceMessage>(serviceMessagesCollectionName);
         }
 
         public void EnsureIndex()

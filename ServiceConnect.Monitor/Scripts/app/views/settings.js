@@ -44,6 +44,15 @@ define(['backbone',
             name: "Password",
             cell: "string"
         }, {
+            name: "SslEnabled",
+            cell: "boolean"
+        }, {
+            name: "CertBase64",
+            cell: "string"
+        }, {
+            name: "CertPassword",
+            cell: "string"
+        }, {
             name: "ErrorQueue",
             cell: "string"
         }, {

@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using MongoDB.Bson;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
-using StructureMap;
 
 namespace ServiceConnect.Monitor.Controllers
 {
@@ -14,10 +12,10 @@ namespace ServiceConnect.Monitor.Controllers
         private readonly IErrorRepository _errorRepository;
         private readonly IServiceRepository _serviceRepository;
 
-        public ErrorController()
+        public ErrorController(IErrorRepository errorRepository, IServiceRepository serviceRepository)
         {
-            _errorRepository = ObjectFactory.GetInstance<IErrorRepository>();
-            _serviceRepository = ObjectFactory.GetInstance<IServiceRepository>();
+            _errorRepository = errorRepository;
+            _serviceRepository = serviceRepository;
         }
 
         [AcceptVerbs("GET")]
@@ -33,9 +31,7 @@ namespace ServiceConnect.Monitor.Controllers
         {
             List<string> tagList = null;
             if (!string.IsNullOrEmpty(tags))
-            {
                 tagList = tags.Split(',').ToList();
-            }
 
             var errors = _errorRepository.Find(from, to);
 
@@ -49,9 +45,7 @@ namespace ServiceConnect.Monitor.Controllers
                 {
                     bool match = services.Any(service => (error.SourceAddress == service.Name || error.DestinationAddress == service.Name) && service.Tags != null && service.Tags.Any(tagList.Contains));
                     if (match)
-                    {
                         results.Add(error);
-                    }
                 }
 
                 return results;

@@ -24,5 +24,9 @@ namespace ServiceConnect.Monitor.Models
         public string ErrorQueue { get; set; }
         public string AuditQueue { get; set; }
         public string HeartbeatQueue { get; set; }
+        public bool SslEnabled { get; set; }
+        public string CertBase64 { get; set; }
+        public string CertPassword { get; set; }
+
     }
 }
