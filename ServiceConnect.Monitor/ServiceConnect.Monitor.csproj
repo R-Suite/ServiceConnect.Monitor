@@ -183,60 +183,164 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Scripts\fonts\fontawesome-webfont.eot" />
-    <None Include="Scripts\fonts\fontawesome-webfont.ttf" />
-    <None Include="Scripts\fonts\fontawesome-webfont.woff" />
-    <None Include="Scripts\fonts\FontAwesome.otf" />
-    <None Include="Scripts\fonts\glyphicons-halflings-regular.eot" />
-    <None Include="Scripts\fonts\glyphicons-halflings-regular.ttf" />
-    <None Include="Scripts\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="Scripts\fonts\fontawesome-webfont.eot">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\fonts\fontawesome-webfont.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\fonts\fontawesome-webfont.woff">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\fonts\FontAwesome.otf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\fonts\glyphicons-halflings-regular.eot">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\fonts\glyphicons-halflings-regular.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\fonts\glyphicons-halflings-regular.woff">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Index.html" />
-    <Content Include="Scripts\dist\images\actions.gif" />
-    <Content Include="Scripts\dist\images\ajax-loader-small.gif" />
-    <Content Include="Scripts\dist\images\arrow_redo.png" />
-    <Content Include="Scripts\dist\images\arrow_right_peppermint.png" />
-    <Content Include="Scripts\dist\images\arrow_right_spearmint.png" />
-    <Content Include="Scripts\dist\images\arrow_undo.png" />
-    <Content Include="Scripts\dist\images\bg.png" />
-    <Content Include="Scripts\dist\images\bullet_blue.png" />
-    <Content Include="Scripts\dist\images\bullet_star.png" />
-    <Content Include="Scripts\dist\images\bullet_toggle_minus.png" />
-    <Content Include="Scripts\dist\images\bullet_toggle_plus.png" />
-    <Content Include="Scripts\dist\images\calendar.gif" />
-    <Content Include="Scripts\dist\images\collapse.gif" />
-    <Content Include="Scripts\dist\images\comment_yellow.gif" />
-    <Content Include="Scripts\dist\images\down.gif" />
-    <Content Include="Scripts\dist\images\drag-handle.png" />
-    <Content Include="Scripts\dist\images\editor-helper-bg.gif" />
-    <Content Include="Scripts\dist\images\expand.gif" />
-    <Content Include="Scripts\dist\images\favicon.ico" />
-    <Content Include="Scripts\dist\images\header-bg.gif" />
-    <Content Include="Scripts\dist\images\header-columns-bg.gif" />
-    <Content Include="Scripts\dist\images\header-columns-over-bg.gif" />
-    <Content Include="Scripts\dist\images\help.png" />
-    <Content Include="Scripts\dist\images\info.gif" />
-    <Content Include="Scripts\dist\images\listview.gif" />
-    <Content Include="Scripts\dist\images\logo.jpg" />
-    <Content Include="Scripts\dist\images\pencil.gif" />
-    <Content Include="Scripts\dist\images\row-over-bg.gif" />
-    <Content Include="Scripts\dist\images\sort-asc.gif" />
-    <Content Include="Scripts\dist\images\sort-asc.png" />
-    <Content Include="Scripts\dist\images\sort-desc.gif" />
-    <Content Include="Scripts\dist\images\sort-desc.png" />
-    <Content Include="Scripts\dist\images\stripes.png" />
-    <Content Include="Scripts\dist\images\tag_red.png" />
-    <Content Include="Scripts\dist\images\tick.png" />
-    <Content Include="Scripts\dist\images\user_identity.gif" />
-    <Content Include="Scripts\dist\images\user_identity_plus.gif" />
-    <Content Include="Scripts\dist\serviceconnect.monitor.min.css" />
-    <Content Include="Scripts\dist\serviceconnect.monitor.min.js" />
-    <Content Include="Scripts\dist\select2-spinner.gif" />
-    <Content Include="Scripts\dist\select2.png" />
-    <Content Include="Scripts\dist\select2x2.png" />
-    <Content Include="Scripts\fonts\fontawesome-webfont.svg" />
-    <Content Include="Scripts\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Index.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\actions.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\ajax-loader-small.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\arrow_redo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\arrow_right_peppermint.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\arrow_right_spearmint.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\arrow_undo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\bg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\bullet_blue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\bullet_star.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\bullet_toggle_minus.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\bullet_toggle_plus.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\calendar.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\collapse.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\comment_yellow.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\down.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\drag-handle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\editor-helper-bg.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\expand.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\favicon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\header-bg.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\header-columns-bg.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\header-columns-over-bg.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\help.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\info.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\listview.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\logo.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\pencil.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\row-over-bg.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\sort-asc.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\sort-asc.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\sort-desc.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\sort-desc.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\stripes.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\tag_red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\tick.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\user_identity.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\images\user_identity_plus.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\serviceconnect.monitor.min.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\serviceconnect.monitor.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\select2-spinner.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\select2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\dist\select2x2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\fonts\fontawesome-webfont.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\fonts\glyphicons-halflings-regular.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
