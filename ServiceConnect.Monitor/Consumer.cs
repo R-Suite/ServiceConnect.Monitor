@@ -34,9 +34,9 @@ namespace ServiceConnect.Monitor
         /// <summary>
         /// Event fired on HandleBasicDeliver
         /// </summary>
-        /// <param name="consumer"></param>
+        /// <param name="sender"></param>
         /// <param name="args"></param>
-        public void Event(IBasicConsumer consumer, BasicDeliverEventArgs args)
+        private void ConsumerOnReceived(object sender, BasicDeliverEventArgs args)
         {
             var headers = new Dictionary<string, string>();
             foreach (KeyValuePair<string, object> header in args.BasicProperties.Headers)
@@ -110,7 +110,7 @@ namespace ServiceConnect.Monitor
                 ConfigureQueue(_forwardQueue);
 
             var consumer = new EventingBasicConsumer(_model);
-            consumer.Received += Event;
+            consumer.Received += ConsumerOnReceived;
             consumer.Shutdown += ConsumerShutdown;
             _model.BasicConsume(queueName, false, consumer);
         }
