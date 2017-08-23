@@ -35,7 +35,7 @@ namespace ServiceConnect.Monitor.Repositories
                         MongoCredential.CreateCredential("admin", mongoUsername, mongoPassword)
                     },
                     ConnectionMode = ConnectionMode.Automatic,
-                    WriteConcern = new WriteConcern { W = WriteConcern.WMajority.W, WTimeout = TimeSpan.FromSeconds(20) },
+                    WriteConcern =  WriteConcern.WMajority,
                     Servers = mongoNodes.Select(x => new MongoServerAddress(x)),
                     SslSettings = new SslSettings
                     {
