@@ -20,27 +20,26 @@ using System.Linq;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using ServiceConnect.Monitor.Interfaces;
-using ServiceConnect.Monitor.Models;
 
 namespace ServiceConnect.Monitor.Repositories
 {
     public class TagRepository : ITagRepository
     {
-        private readonly MongoCollection<Tag> _tagCollection;
+        private readonly MongoCollection<Models.Tag> _tagCollection;
 
         public TagRepository(IMongoRepository mongoRepository, string tagCollectionName)
         {
-            _tagCollection = mongoRepository.Database.GetCollection<Tag>(tagCollectionName);
+            _tagCollection = mongoRepository.Database.GetCollection<Models.Tag>(tagCollectionName);
         }
 
-        public List<Tag> Find()
+        public List<Models.Tag> Find()
         {
             return _tagCollection.AsQueryable().ToList();
         }
 
         public void Insert(string tag)
         {
-            var model = new Tag
+            var model = new Models.Tag
             {
                 Name = tag,
                 Id = Guid.NewGuid()
