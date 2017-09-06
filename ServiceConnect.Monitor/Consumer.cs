@@ -9,7 +9,7 @@ using RabbitMQ.Client.Events;
 
 namespace ServiceConnect.Monitor
 {
-    public delegate void ConsumerEventHandler(string message, IDictionary<string, string> headers, string host);
+    public delegate Task ConsumerEventHandler(string message, IDictionary<string, string> headers, string host);
 
     public class Consumer : IDisposable
     {
@@ -20,7 +20,7 @@ namespace ServiceConnect.Monitor
         private IModel _model;
         private AsyncEventingBasicConsumer _consumer;
 
-        private Func<string, IDictionary<string, string>, string, Task> _consumerEventHandler;
+        private ConsumerEventHandler _consumerEventHandler;
 
         private string _queueName;
         private string _forwardQueue;
@@ -61,7 +61,7 @@ namespace ServiceConnect.Monitor
                 _model.BasicAck(args.DeliveryTag, false);
         }
 
-        public void StartConsuming(Func<string, IDictionary<string, string>, string, Task> messageReceived, string queueName, string forwardQueue)
+        public void StartConsuming(ConsumerEventHandler messageReceived, string queueName, string forwardQueue)
         {
             _consumerEventHandler = messageReceived;
             _queueName = queueName;
