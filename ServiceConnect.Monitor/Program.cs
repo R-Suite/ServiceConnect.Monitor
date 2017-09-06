@@ -139,9 +139,9 @@ namespace ServiceConnect.Monitor
                     HeartbeatMessageHandler = new HearbeatMessageHandler(_container.GetInstance<IHeartbeatRepository>(), heartbeatHub),
                     ReceivingConnection = receivingConnection,
                     SendingConnection = sendingConnection,
-                    AuditConsumer = new Consumer(receivingConnection),
-                    ErrorConsumer = new Consumer(receivingConnection),
-                    HeartbeatConsumer = new Consumer(receivingConnection),
+                    AuditConsumer = new ConsumerPool(receivingConnection),
+                    ErrorConsumer = new ConsumerPool(receivingConnection),
+                    HeartbeatConsumer = new ConsumerPool(receivingConnection),
                     Producer = new Producer(sendingConnection)
                 };
                 string forwardErrorQueue = null;

@@ -8,6 +8,7 @@ using System;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using log4net;
+using Microsoft.Owin.Security;
 using RabbitMQ.Client;
 using Environment = ServiceConnect.Monitor.Models.Environment;
 
@@ -17,16 +18,13 @@ namespace ServiceConnect.Monitor
     {
         private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private IConnection _connection;
-
         public Environment Environment { get; private set; }
 
-        private bool _isConnectionClosed;
+        private IConnection _connection;
 
         public Connection(Environment environment)
         {
             Environment = environment;
-            _isConnectionClosed = true;
         }
 
         private void CreateConnection()
@@ -62,8 +60,12 @@ namespace ServiceConnect.Monitor
                 connectionFactory.Password = Environment.Password;
 
             _connection = connectionFactory.CreateConnection();
-            
-            _isConnectionClosed = false;
+        }
+
+        public void Connect()
+        {
+            if (_connection == null)
+                CreateConnection();
         }
 
         public IModel CreateModel()
@@ -76,10 +78,9 @@ namespace ServiceConnect.Monitor
 
         public void Dispose()
         {
-            if (_isConnectionClosed) return;
             if (_connection == null) return;
-            _isConnectionClosed = true;
             _connection.Abort(500);
+            _connection = null;
         }
     }
 }

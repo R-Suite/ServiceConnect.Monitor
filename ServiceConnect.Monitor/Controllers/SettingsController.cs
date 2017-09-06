@@ -118,9 +118,9 @@ namespace ServiceConnect.Monitor.Controllers
                         HeartbeatMessageHandler = new HearbeatMessageHandler(_heartbeatRepository, heartbeatHub),
                         ReceivingConnection = receivingConnection,
                         SendingConnection = sendingConnection,
-                        AuditConsumer = new Consumer(receivingConnection),
-                        ErrorConsumer = new Consumer(receivingConnection),
-                        HeartbeatConsumer = new Consumer(receivingConnection),
+                        AuditConsumer = new ConsumerPool(receivingConnection),
+                        ErrorConsumer = new ConsumerPool(receivingConnection),
+                        HeartbeatConsumer = new ConsumerPool(receivingConnection),
                         Producer = new Producer(sendingConnection)
                     };
 

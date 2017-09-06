@@ -167,6 +167,7 @@
     <Compile Include="AuditConfig.cs" />
     <Compile Include="Connection.cs" />
     <Compile Include="Consumer.cs" />
+    <Compile Include="ConsumerPool.cs" />
     <Compile Include="Controllers\AuditController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HeartbeatController.cs" />
