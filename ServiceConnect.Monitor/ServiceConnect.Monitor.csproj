@@ -165,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuditConfig.cs" />
+    <Compile Include="Connection.cs" />
     <Compile Include="Consumer.cs" />
     <Compile Include="Controllers\AuditController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
