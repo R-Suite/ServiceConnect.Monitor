@@ -75,7 +75,7 @@ namespace ServiceConnect.Monitor
 
             _model = _connection.CreateModel();
 
-            _model.BasicQos(0, 50, false);
+            _model.BasicQos(0, 25, false);
 
             var queueName = ConfigureQueue(_queueName);
 
