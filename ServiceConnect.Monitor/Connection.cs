@@ -36,7 +36,9 @@ namespace ServiceConnect.Monitor
                 Port = AmqpTcpEndpoint.UseDefaultPort,
                 RequestedHeartbeat = 30,
                 DispatchConsumersAsync = true,
-                UseBackgroundThreadsForIO = true
+                UseBackgroundThreadsForIO = true,
+                AutomaticRecoveryEnabled = true,
+                TopologyRecoveryEnabled = true
             };
             
             if (Environment.SslEnabled)
