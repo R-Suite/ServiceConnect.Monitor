@@ -5,6 +5,7 @@
 // ******************
 
 using System;
+using System.Linq;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using log4net;
@@ -40,14 +41,16 @@ namespace ServiceConnect.Monitor
                 AutomaticRecoveryEnabled = true,
                 TopologyRecoveryEnabled = true
             };
-            
+
+            var hostnames = Environment.Server.Split(',', ';');
+
             if (Environment.SslEnabled)
             {
                 connectionFactory.Ssl = new SslOption
                 {
                     Enabled = true,
                     AcceptablePolicyErrors = SslPolicyErrors.None,
-                    ServerName = Environment.Server,
+                    ServerName = hostnames.First(),
                     CertPassphrase = Environment.CertPassword,
                     Certs = new X509Certificate2Collection {new X509Certificate2(Convert.FromBase64String(Environment.CertBase64), Environment.CertPassword)},
                     CertificateSelectionCallback = null,
@@ -61,7 +64,7 @@ namespace ServiceConnect.Monitor
             if (!string.IsNullOrEmpty(Environment.Password))
                 connectionFactory.Password = Environment.Password;
 
-            _connection = connectionFactory.CreateConnection();
+            _connection = connectionFactory.CreateConnection(hostnames, "ServiceConnect.Monitor");
         }
 
         public void Connect()
