@@ -77,7 +77,7 @@ namespace ServiceConnect.Monitor
             if (_isConnectionClosed) return;
             if (_connection == null) return;
             _isConnectionClosed = true;
-            _connection.Close(500);
+            _connection.Abort(500);
         }
     }
 }
