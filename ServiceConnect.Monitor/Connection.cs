@@ -36,7 +36,9 @@ namespace ServiceConnect.Monitor
                 HostName = Environment.Server,
                 Protocol = Protocols.DefaultProtocol,
                 Port = AmqpTcpEndpoint.UseDefaultPort,
-                RequestedHeartbeat = 30
+                RequestedHeartbeat = 30,
+                DispatchConsumersAsync = true,
+                UseBackgroundThreadsForIO = true
             };
             
             if (Environment.SslEnabled)
@@ -60,7 +62,7 @@ namespace ServiceConnect.Monitor
                 connectionFactory.Password = Environment.Password;
 
             _connection = connectionFactory.CreateConnection();
-
+            
             _isConnectionClosed = false;
         }
 

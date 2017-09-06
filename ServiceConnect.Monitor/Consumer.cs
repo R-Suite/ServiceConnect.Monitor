@@ -17,7 +17,7 @@ namespace ServiceConnect.Monitor
         private readonly Connection _connection;
 
         private IModel _model;
-        private EventingBasicConsumer _consumer;
+        private AsyncEventingBasicConsumer _consumer;
 
         private ConsumerEventHandler _consumerEventHandler;
 
@@ -36,32 +36,28 @@ namespace ServiceConnect.Monitor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void ConsumerOnReceived(object sender, BasicDeliverEventArgs args)
+        private async Task ConsumerOnReceived(object sender, BasicDeliverEventArgs args)
         {
-            Task.Run(async () =>
+            var headers = new Dictionary<string, string>();
+            foreach (var header in args.BasicProperties.Headers)
             {
-                var headers = new Dictionary<string, string>();
-                foreach (var header in args.BasicProperties.Headers)
+                try
                 {
-                    try
-                    {
-                        headers[header.Key] = Encoding.UTF8.GetString((byte[]) header.Value);
-                    }
-                    catch { }
+                    headers[header.Key] = Encoding.UTF8.GetString((byte[]) header.Value);
                 }
+                catch { }
+            }
 
-                var message = Encoding.UTF8.GetString(args.Body);
+            var message = Encoding.UTF8.GetString(args.Body);
 
-                await _consumerEventHandler(message, headers, _connection.Environment.Server);
+            await _consumerEventHandler(message, headers, _connection.Environment.Server);
 
-                if (!string.IsNullOrEmpty(_forwardQueue))
-                    if (!_isDisposed)
-                        _model.BasicPublish(string.Empty, _forwardQueue, args.BasicProperties, args.Body);
-
+            if (!string.IsNullOrEmpty(_forwardQueue))
                 if (!_isDisposed)
-                    _model.BasicAck(args.DeliveryTag, false);
+                    _model.BasicPublish(string.Empty, _forwardQueue, args.BasicProperties, args.Body);
 
-            }).GetAwaiter().GetResult();
+            if (!_isDisposed)
+                _model.BasicAck(args.DeliveryTag, false);
         }
 
         public void StartConsuming(ConsumerEventHandler messageReceived, string queueName, string forwardQueue)
@@ -79,12 +75,14 @@ namespace ServiceConnect.Monitor
 
             _model = _connection.CreateModel();
 
+            _model.BasicQos(0, 50, false);
+
             var queueName = ConfigureQueue(_queueName);
 
             if (_forwardQueue != null)
                 ConfigureQueue(_forwardQueue);
 
-            _consumer = new EventingBasicConsumer(_model);
+            _consumer = new AsyncEventingBasicConsumer(_model);
             _consumer.Received += ConsumerOnReceived;
             _model.BasicConsume(queueName, false, _consumer);
         }
