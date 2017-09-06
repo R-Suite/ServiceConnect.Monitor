@@ -24,8 +24,6 @@ namespace ServiceConnect.Monitor
         private string _queueName;
         private string _forwardQueue;
 
-        private bool _isDisposed;
-
         public Consumer(Connection connection)
         {
             _connection = connection;
@@ -38,6 +36,8 @@ namespace ServiceConnect.Monitor
         /// <param name="args"></param>
         private async Task ConsumerOnReceived(object sender, BasicDeliverEventArgs args)
         {
+            var consumer = (AsyncEventingBasicConsumer) sender;
+
             var headers = new Dictionary<string, string>();
             foreach (var header in args.BasicProperties.Headers)
             {
@@ -53,10 +53,10 @@ namespace ServiceConnect.Monitor
             await _consumerEventHandler(message, headers, _connection.Environment.Server);
 
             if (!string.IsNullOrEmpty(_forwardQueue))
-                if (!_isDisposed)
+                if (consumer.Model.IsOpen)
                     _model.BasicPublish(string.Empty, _forwardQueue, args.BasicProperties, args.Body);
 
-            if (!_isDisposed)
+            if (consumer.Model.IsOpen)
                 _model.BasicAck(args.DeliveryTag, false);
         }
 
@@ -110,10 +110,16 @@ namespace ServiceConnect.Monitor
 
         public void Dispose()
         {
-            _consumer.Received -= ConsumerOnReceived;
-            _isDisposed = true;
+            if (_consumer != null)
+            {
+                _consumer.Received -= ConsumerOnReceived;
+                _consumer = null;
+            }
             if (_model != null)
+            {
                 _model.Abort();
+                _model = null;
+            }
         }
     }
 }
