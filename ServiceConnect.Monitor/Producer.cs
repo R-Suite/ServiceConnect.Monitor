@@ -37,7 +37,7 @@ namespace ServiceConnect.Monitor
         {
             lock (_lock)
                 if (_model != null)
-                    _model.Close();
+                    _model.Abort();
         }
     }
 }

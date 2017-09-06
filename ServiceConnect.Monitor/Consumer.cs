@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Configuration;
 using System.Text;
 using log4net;
 using RabbitMQ.Client;
@@ -14,12 +15,16 @@ namespace ServiceConnect.Monitor
         private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly Connection _connection;
+
         private IModel _model;
+        private EventingBasicConsumer _consumer;
 
         private ConsumerEventHandler _consumerEventHandler;
 
         private string _queueName;
         private string _forwardQueue;
+
+        private bool _isDisposed;
 
         public Consumer(Connection connection)
         {
@@ -48,9 +53,11 @@ namespace ServiceConnect.Monitor
             _consumerEventHandler(message, headers, _connection.Environment.Server);
 
             if (!string.IsNullOrEmpty(_forwardQueue))
-                _model.BasicPublish(string.Empty, _forwardQueue, args.BasicProperties, args.Body);
+                if (!_isDisposed)
+                    _model.BasicPublish(string.Empty, _forwardQueue, args.BasicProperties, args.Body);
 
-            _model.BasicAck(args.DeliveryTag, false);
+            if (!_isDisposed)
+                _model.BasicAck(args.DeliveryTag, false);
         }
 
         public void StartConsuming(ConsumerEventHandler messageReceived, string queueName, string forwardQueue)
@@ -73,9 +80,9 @@ namespace ServiceConnect.Monitor
             if (_forwardQueue != null)
                 ConfigureQueue(_forwardQueue);
 
-            var consumer = new EventingBasicConsumer(_model);
-            consumer.Received += ConsumerOnReceived;
-            _model.BasicConsume(queueName, false, consumer);
+            _consumer = new EventingBasicConsumer(_model);
+            _consumer.Received += ConsumerOnReceived;
+            _model.BasicConsume(queueName, false, _consumer);
         }
 
         public void SetForwardQueue(string queue)
@@ -100,8 +107,10 @@ namespace ServiceConnect.Monitor
 
         public void Dispose()
         {
+            _consumer.Received -= ConsumerOnReceived;
+            _isDisposed = true;
             if (_model != null)
-                _model.Close();
+                _model.Abort();
         }
     }
 }
