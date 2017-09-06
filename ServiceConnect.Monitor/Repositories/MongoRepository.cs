@@ -9,7 +9,7 @@ namespace ServiceConnect.Monitor.Repositories
 {
     public class MongoRepository : IMongoRepository
     {
-        public MongoDatabase Database { get; private set; }
+        public IMongoDatabase Database { get; private set; }
 
         public MongoRepository(
             string mongoConnectionString,
@@ -50,9 +50,8 @@ namespace ServiceConnect.Monitor.Repositories
 
                 client = new MongoClient(settings);
             }
-
-            var server = client.GetServer();
-            Database = server.GetDatabase(databaseName);
+            
+            Database = client.GetDatabase(databaseName);
         }
     }
 }

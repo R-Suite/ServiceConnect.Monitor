@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Configuration;
 using System.Text;
+using System.Threading.Tasks;
 using log4net;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -17,9 +18,9 @@ namespace ServiceConnect.Monitor
         private readonly Connection _connection;
 
         private IModel _model;
-        private EventingBasicConsumer _consumer;
+        private AsyncEventingBasicConsumer _consumer;
 
-        private ConsumerEventHandler _consumerEventHandler;
+        private Func<string, IDictionary<string, string>, string, Task> _consumerEventHandler;
 
         private string _queueName;
         private string _forwardQueue;
@@ -36,7 +37,7 @@ namespace ServiceConnect.Monitor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void ConsumerOnReceived(object sender, BasicDeliverEventArgs args)
+        private async Task ConsumerOnReceived(object sender, BasicDeliverEventArgs args)
         {
             var headers = new Dictionary<string, string>();
             foreach (var header in args.BasicProperties.Headers)
@@ -50,7 +51,7 @@ namespace ServiceConnect.Monitor
 
             var message = Encoding.UTF8.GetString(args.Body);
 
-            _consumerEventHandler(message, headers, _connection.Environment.Server);
+            await _consumerEventHandler(message, headers, _connection.Environment.Server);
 
             if (!string.IsNullOrEmpty(_forwardQueue))
                 if (!_isDisposed)
@@ -60,7 +61,7 @@ namespace ServiceConnect.Monitor
                 _model.BasicAck(args.DeliveryTag, false);
         }
 
-        public void StartConsuming(ConsumerEventHandler messageReceived, string queueName, string forwardQueue)
+        public void StartConsuming(Func<string, IDictionary<string, string>, string, Task> messageReceived, string queueName, string forwardQueue)
         {
             _consumerEventHandler = messageReceived;
             _queueName = queueName;
@@ -80,10 +81,11 @@ namespace ServiceConnect.Monitor
             if (_forwardQueue != null)
                 ConfigureQueue(_forwardQueue);
 
-            _consumer = new EventingBasicConsumer(_model);
+            _consumer = new AsyncEventingBasicConsumer(_model);
             _consumer.Received += ConsumerOnReceived;
             _model.BasicConsume(queueName, false, _consumer);
         }
+        
 
         public void SetForwardQueue(string queue)
         {

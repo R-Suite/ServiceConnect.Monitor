@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using MongoDB.Bson;
 using ServiceConnect.Monitor.Models;
 
@@ -23,11 +24,11 @@ namespace ServiceConnect.Monitor.Interfaces
 {
     public interface IAuditRepository
     {
-        void InsertAudit(Audit model);
-        IList<Audit> Find(DateTime @from, DateTime to);
-        void EnsureIndex();
-        Audit Get(ObjectId objectId);
-        void Remove(DateTime before);
-        IList<Audit> Find(Guid correlationId);
+        Task InsertAudit(Audit model);
+        Task<List<Audit>> Find(DateTime @from, DateTime to);
+        Task EnsureIndex();
+        Task<Audit> Get(ObjectId objectId);
+        Task Remove(DateTime before);
+        Task<List<Audit>> Find(Guid correlationId);
     }
 }

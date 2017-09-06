@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using ServiceConnect.Monitor.Interfaces;
@@ -41,48 +42,44 @@ namespace ServiceConnect.Monitor.Handlers
             _timer = new Timer(callback, null, 0, 2500);
         }
 
-        public void Execute(string message, IDictionary<string, string> headers, string host)
+        public async Task Execute(string message, IDictionary<string, string> headers, string host)
         {
-            lock (_lock)
+            var error = new Error
             {
-                var error = new Error
-                {
-                    Body = message,
-                    DestinationAddress = headers["DestinationAddress"],
-                    DestinationMachine = headers["DestinationMachine"],
-                    FullTypeName = headers["FullTypeName"],
-                    MessageId = headers["MessageId"],
-                    MessageType = headers["MessageType"],
-                    SourceAddress = headers["SourceAddress"],
-                    SourceMachine = headers["SourceMachine"],
-                    TypeName = headers["TypeName"],
-                    ConsumerType = headers["ConsumerType"],
-                    TimeProcessed = DateTime.ParseExact(headers["TimeProcessed"], "O", CultureInfo.InvariantCulture),
-                    TimeReceived = DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture),
-                    TimeSent = DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture),
-                    Exception = JsonConvert.DeserializeObject<MessageException>(headers["Exception"]),
-                    Language = headers["Language"],
-                    CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId,
-                    Server = host,
-                    Headers = headers
-                };
+                Body = message,
+                DestinationAddress = headers["DestinationAddress"],
+                DestinationMachine = headers["DestinationMachine"],
+                FullTypeName = headers["FullTypeName"],
+                MessageId = headers["MessageId"],
+                MessageType = headers["MessageType"],
+                SourceAddress = headers["SourceAddress"],
+                SourceMachine = headers["SourceMachine"],
+                TypeName = headers["TypeName"],
+                ConsumerType = headers["ConsumerType"],
+                TimeProcessed = DateTime.ParseExact(headers["TimeProcessed"], "O", CultureInfo.InvariantCulture),
+                TimeReceived = DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture),
+                TimeSent = DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture),
+                Exception = JsonConvert.DeserializeObject<MessageException>(headers["Exception"]),
+                Language = headers["Language"],
+                CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId,
+                Server = host,
+                Headers = headers
+            };
 
-                _errorRepository.InsertError(error);
+            await _errorRepository.InsertError(error);
 
+            lock (_lock)
                 _errors.Add(error);
-            }
         }
 
         private void SendErrors(object state)
         {
             lock (_lock)
-            {
                 if (_errors.Count > 0)
                 {
                     _hub.Clients.All.Errors(_errors);
                     _errors.Clear();
                 }
-            }
         }
 
         public void Dispose()

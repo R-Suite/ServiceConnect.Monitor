@@ -16,16 +16,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using ServiceConnect.Monitor.Models;
 
 namespace ServiceConnect.Monitor.Interfaces
 {
     public interface IHeartbeatRepository
     {
-        void InsertHeartbeat(Heartbeat heartbeat);
-        List<Heartbeat> Find(string name, string location, DateTime @from, DateTime to);
-        void Remove(string name, string location);
-        void EnsureIndex();
-        void Remove(DateTime before);
+        Task InsertHeartbeat(Heartbeat heartbeat);
+        Task<List<Heartbeat>> Find(string name, string location, DateTime @from, DateTime to);
+        Task Remove(string name, string location);
+        Task EnsureIndex();
+        Task Remove(DateTime before);
     }
 }

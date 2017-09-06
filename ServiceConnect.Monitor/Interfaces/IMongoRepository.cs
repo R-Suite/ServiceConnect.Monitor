@@ -4,6 +4,6 @@ namespace ServiceConnect.Monitor.Interfaces
 {
     public interface IMongoRepository
     {
-        MongoDatabase Database { get; }
+        IMongoDatabase Database { get; }
     }
 }
