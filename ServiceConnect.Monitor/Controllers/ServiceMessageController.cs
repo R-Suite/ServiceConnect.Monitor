@@ -15,6 +15,7 @@
 //Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
@@ -32,9 +33,9 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("serviceMessages")]
-        public IList<ServiceMessage> FindServiceMessages()
+        public async Task<IList<ServiceMessage>> FindServiceMessages()
         {
-            return _serviceMessageRepository.Find();
+            return await _serviceMessageRepository.Find();
         }
     }
 }

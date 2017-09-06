@@ -14,13 +14,14 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+using System.Threading.Tasks;
 using ServiceConnect.Monitor.Models;
 
 namespace ServiceConnect.Monitor.Interfaces
 {
     public interface ISettingsRepository
     {
-        Settings Get();
-        void Update(Settings settings);
+        Task<Settings> Get();
+        Task Update(Settings settings);
     }
 }

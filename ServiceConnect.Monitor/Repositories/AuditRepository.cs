@@ -16,11 +16,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
-using MongoDB.Driver.Linq;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
 
@@ -28,8 +26,8 @@ namespace ServiceConnect.Monitor.Repositories
 {
     public class AuditRepository : IAuditRepository
     {
-        private readonly MongoCollection<Audit> _auditCollection;
-        private readonly MongoCollection<ServiceMessage> _serviceMessagesCollection;
+        private readonly IMongoCollection<Audit> _auditCollection;
+        private readonly IMongoCollection<ServiceMessage> _serviceMessagesCollection;
 
         public AuditRepository(IMongoRepository mongoRepository, string auditCollecitonName, string serviceMessagesCollectionName)
         {
@@ -37,49 +35,56 @@ namespace ServiceConnect.Monitor.Repositories
             _serviceMessagesCollection = mongoRepository.Database.GetCollection<ServiceMessage>(serviceMessagesCollectionName);
         }
 
-        public void EnsureIndex()
+        public async Task EnsureIndex()
         {
-            _auditCollection.CreateIndex(IndexKeys<Audit>.Descending(x => x.TimeSent));
-            _auditCollection.CreateIndex(IndexKeys<Audit>.Ascending(x => x.CorrelationId));
+            await _auditCollection.Indexes.CreateOneAsync(Builders<Audit>.IndexKeys.Descending(x => x.TimeSent));
+            await _auditCollection.Indexes.CreateOneAsync(Builders<Audit>.IndexKeys.Ascending(x => x.CorrelationId));
         }
 
-        public Audit Get(ObjectId objectId)
+        public Task<Audit> Get(ObjectId objectId)
         {
-            return _auditCollection.FindOneById(objectId);
+            return _auditCollection.Find(Builders<Audit>.Filter.Eq(a => a.Id, objectId)).SingleAsync();
         }
 
-        public void Remove(DateTime before)
+        public async Task Remove(DateTime before)
         {
-            _auditCollection.Remove(Query<Audit>.LT(x => x.TimeSent, before));
+            await _auditCollection.DeleteManyAsync(Builders<Audit>.Filter.Lt(x => x.TimeSent, before));
         }
 
-        public IList<Audit> Find(Guid correlationId)
+        public Task<List<Audit>> Find(Guid correlationId)
         {
-            return _auditCollection.Find(Query<Audit>.EQ(x => x.CorrelationId, correlationId)).OrderByDescending(x => x.TimeSent).ToList();
+            return _auditCollection.Find(Builders<Audit>.Filter.Eq(x => x.CorrelationId, correlationId)).Sort(Builders<Audit>.Sort.Descending(x => x.TimeSent)).ToListAsync();
         }
 
-        public void InsertAudit(Audit model)
+        public async Task InsertAudit(Audit model)
         {
-            _auditCollection.Insert(model);
+            await _auditCollection.InsertOneAsync(model);
 
-            _serviceMessagesCollection.Update(
-                Query.And(
-                    Query<ServiceMessage>.EQ(x => x.In, model.DestinationAddress),
-                    Query<ServiceMessage>.EQ(x => x.Out, model.SourceAddress)
+            await _serviceMessagesCollection.UpdateOneAsync(
+                Builders<ServiceMessage>.Filter.And(
+                    Builders<ServiceMessage>.Filter.Eq(x => x.In, model.DestinationAddress),
+                    Builders<ServiceMessage>.Filter.Eq(x => x.Out, model.SourceAddress)
                 ),
-                Update<ServiceMessage>.Inc(x => x.Count, 1).
-                                       Set(x => x.LastSent, model.TimeReceived).
-                                       Set(x => x.Type, model.TypeName),
-                UpdateFlags.Upsert);
+                Builders<ServiceMessage>.Update
+                    .Inc(x => x.Count, 1)
+                    .Set(x => x.LastSent, model.TimeReceived)
+                    .Set(x => x.Type, model.TypeName),
+                new UpdateOptions {IsUpsert = true});
         }
 
-        public IList<Audit> Find(DateTime @from, DateTime to)
+        public Task<List<Audit>> Find(DateTime @from, DateTime to)
         {
-            var result = _auditCollection.AsQueryable().Where(x =>
-               x.TimeSent >= from &&
-               x.TimeSent <= to).OrderByDescending(x => x.TimeSent);
+            //var result = _auditCollection
+            //    .AsQueryable()
+            //    .Where(x => x.TimeSent >= from && x.TimeSent <= to)
+            //   .OrderByDescending(x => x.TimeSent);
 
-            return result.ToList();
+            return _auditCollection
+                .Find(Builders<Audit>.Filter.And(
+                    Builders<Audit>.Filter.Gte(x => x.TimeSent, from),
+                    Builders<Audit>.Filter.Lte(x => x.TimeSent, to)))
+                .Sort(Builders<Audit>.Sort.Descending(x => x.TimeSent))
+                .ToListAsync();
         }
     }
 }

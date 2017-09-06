@@ -15,13 +15,14 @@
 //Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using ServiceConnect.Monitor.Models;
 
 namespace ServiceConnect.Monitor.Interfaces
 {
     public interface ITagRepository
     {
-        List<Tag> Find();
-        void Insert(string tag);
+        Task<List<Tag>> Find();
+        Task Insert(string tag);
     }
 }

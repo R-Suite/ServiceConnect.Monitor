@@ -109,7 +109,7 @@ namespace ServiceConnect.Monitor
             var heartbeatHub = GlobalHost.ConnectionManager.GetHubContext<HeartbeatHub>();
 
             var settingsRepository  = _container.GetInstance<ISettingsRepository>();
-            var settings = settingsRepository.Get();
+            var settings = settingsRepository.Get().GetAwaiter().GetResult();
             if (settings == null)
             {
                 settings = new Settings

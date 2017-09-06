@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using ServiceConnect.Monitor.Interfaces;
@@ -41,46 +42,43 @@ namespace ServiceConnect.Monitor.Handlers
             _timer = new Timer(callback, null, 0, 2500);
         }
 
-        public void Execute(string message, IDictionary<string, string> headers, string host)
+        public async Task Execute(string message, IDictionary<string, string> headers, string host)
         {
-            lock (_lock)
+            var audit = new Audit
             {
-                var audit = new Audit
-                {
-                    Body = message,
-                    DestinationAddress = headers["DestinationAddress"],
-                    DestinationMachine = headers["DestinationMachine"],
-                    FullTypeName = headers["FullTypeName"],
-                    MessageId = headers["MessageId"],
-                    MessageType = headers["MessageType"],
-                    SourceAddress = headers["SourceAddress"],
-                    SourceMachine = headers["SourceMachine"],
-                    TypeName = headers["TypeName"],
-                    ConsumerType = headers["ConsumerType"],
-                    TimeProcessed = DateTime.ParseExact(headers["TimeProcessed"], "O", CultureInfo.InvariantCulture),
-                    TimeReceived = DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture),
-                    TimeSent = DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture),
-                    Language = headers["Language"],
-                    CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId,
-                    Server = host,
-                    Headers = headers
-                };
+                Body = message,
+                DestinationAddress = headers["DestinationAddress"],
+                DestinationMachine = headers["DestinationMachine"],
+                FullTypeName = headers["FullTypeName"],
+                MessageId = headers["MessageId"],
+                MessageType = headers["MessageType"],
+                SourceAddress = headers["SourceAddress"],
+                SourceMachine = headers["SourceMachine"],
+                TypeName = headers["TypeName"],
+                ConsumerType = headers["ConsumerType"],
+                TimeProcessed = DateTime.ParseExact(headers["TimeProcessed"], "O", CultureInfo.InvariantCulture),
+                TimeReceived = DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture),
+                TimeSent = DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture),
+                Language = headers["Language"],
+                CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId,
+                Server = host,
+                Headers = headers
+            };
 
-                _auditRepository.InsertAudit(audit);
+            await _auditRepository.InsertAudit(audit);
+
+            lock (_lock)
                 _audits.Add(audit);
-            }
         }
 
         private void SendAudits(object state)
         {
             lock (_lock)
-            {
                 if (_audits.Count > 0)
                 {
                     _hub.Clients.All.Audits(_audits);
                     _audits.Clear();
                 }
-            }
         }
 
         public void Dispose()

@@ -15,6 +15,7 @@
 //Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using MongoDB.Bson;
 using ServiceConnect.Monitor.Models;
 
@@ -22,12 +23,12 @@ namespace ServiceConnect.Monitor.Interfaces
 {
     public interface IServiceRepository
     {
-        IList<Service> Find();
-        Service Find(string name, string location);
-        IList<Service> FindByName(string name);
-        void Update(Service model);
-        Service Get(ObjectId id);
-        void Delete(ObjectId id);
-        void EnsureIndex();
+        Task<List<Service>> Find();
+        Task<Service> Find(string name, string location);
+        Task<List<Service>> FindByName(string name);
+        Task Update(Service model);
+        Task<Service> Get(ObjectId id);
+        Task Delete(ObjectId id);
+        Task EnsureIndex();
     }
 }

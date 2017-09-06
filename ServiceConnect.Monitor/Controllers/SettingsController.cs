@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.AspNet.SignalR;
 using ServiceConnect.Monitor.Handlers;
@@ -42,14 +43,14 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("settings")]
-        public Settings GetSettings()
+        public async Task<Settings> GetSettings()
         {
-            return _settingsRepository.Get();
+            return await _settingsRepository.Get();
         }
 
         [AcceptVerbs("POST", "PUT")]
         [Route("settings")]
-        public Settings UpdateSettings(Settings model)
+        public async Task<Settings> UpdateSettings(Settings model)
         {
             if (string.IsNullOrEmpty(model.KeepAuditsFor))
                 model.KeepAuditsFor = "Forever";
@@ -60,7 +61,7 @@ namespace ServiceConnect.Monitor.Controllers
             if (string.IsNullOrEmpty(model.KeepHeartbeatsFor))
                 model.KeepHeartbeatsFor = "Forever";
 
-            _settingsRepository.Update(model);
+            await _settingsRepository.Update(model);
 
             if (model.ForwardAudit == false)
                 foreach (var consumerEnvironment in Globals.Environments)

@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using MongoDB.Bson;
 using ServiceConnect.Monitor.Interfaces;
@@ -39,13 +40,14 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("services")]
-        public IList<Service> FindServices(string tags = null)
+        public async Task<IList<Service>> FindServices(string tags = null)
         {
             List<string> tagList = null;
             if (!string.IsNullOrEmpty(tags))
                 tagList = tags.Split(',').ToList();
 
-            var services = _serviceRepository.Find().Where(x => tagList == null || tagList.Any(y => x.Tags != null && x.Tags.Contains(y))).OrderBy(x => x.Name).ToList();
+            var services = await _serviceRepository.Find();
+            services = services.Where(x => tagList == null || tagList.Any(y => x.Tags != null && x.Tags.Contains(y))).OrderBy(x => x.Name).ToList();
             foreach (var service in services)
                 service.Status = service.LastHeartbeat < DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 35)) ? "Red" : "Green";
 
@@ -54,47 +56,51 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("service")]
-        public Service FindService(string name, string location)
+        public async Task<Service> FindService(string name, string location)
         {
-            return _serviceRepository.Find(name, location);
+            return await _serviceRepository.Find(name, location);
         }
 
         [AcceptVerbs("PUT")]
         [Route("service/{id}")]
-        public Service UpdateService(Service model)
+        public async Task<Service> UpdateService(Service model)
         {
-            var tags = _tagRepository.Find().Select(x => x.Name).ToList();
+            var tags = await _tagRepository.Find();
+            var tagNames = tags.Select(x => x.Name).ToList();
             var modelTags = model.Tags;
             if (modelTags != null)
                 foreach (var modelTag in modelTags)
-                    if (!tags.Contains(modelTag))
-                        _tagRepository.Insert(modelTag);
+                    if (!tagNames.Contains(modelTag))
+                        await _tagRepository.Insert(modelTag);
 
-            var service = _serviceRepository.Find(model.Name, model.InstanceLocation);
+            var service = await _serviceRepository.Find(model.Name, model.InstanceLocation);
             service.Tags = model.Tags;
 
-            _serviceRepository.Update(service);
+            await _serviceRepository.Update(service);
+
             return model;
         }
 
         [AcceptVerbs("DELETE")]
         [Route("service/{id}")]
-        public void DeleteService(string id)
+        public async Task DeleteService(string id)
         {
-            var service = _serviceRepository.Get(new ObjectId(id));
-            _serviceRepository.Delete(new ObjectId(id));
-            _heartbeatRepository.Remove(service.Name, service.InstanceLocation);
+            var service = await _serviceRepository.Get(new ObjectId(id));
+            await _serviceRepository.Delete(new ObjectId(id));
+            await _heartbeatRepository.Remove(service.Name, service.InstanceLocation);
         }
 
         [AcceptVerbs("GET")]
         [Route("endpoints")]
-        public IList<Service> FindEndpoints(string tags = null)
+        public async Task<IList<Service>> FindEndpoints(string tags = null)
         {
             List<string> tagList = null;
             if (!string.IsNullOrEmpty(tags))
                 tagList = tags.Split(',').ToList();
 
-            return _serviceRepository.Find().GroupBy(x => x.Name).Select(x => new Service
+            var services = await _serviceRepository.Find();
+
+            return services.GroupBy(x => x.Name).Select(x => new Service
             {
                 In = x.First().In,
                 Out = x.First().Out,

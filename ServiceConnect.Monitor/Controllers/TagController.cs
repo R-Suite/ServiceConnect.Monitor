@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using ServiceConnect.Monitor.Interfaces;
 
@@ -32,9 +33,9 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("tags")]
-        public IList<string> FindTags(string query = "")
+        public async Task<IList<string>> FindTags(string query = "")
         {
-            var tags = _tagRepository.Find();
+            var tags = await _tagRepository.Find();
             if (!string.IsNullOrEmpty(query))
                 tags = tags.Where(x => x.Name.ToLower().Contains(query.ToLower())).ToList();
 

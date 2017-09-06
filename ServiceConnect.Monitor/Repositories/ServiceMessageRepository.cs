@@ -15,10 +15,8 @@
 //Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
-using MongoDB.Driver.Linq;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
 
@@ -26,21 +24,21 @@ namespace ServiceConnect.Monitor.Repositories
 {
     public class ServiceMessageRepository : IServiceMessageRepository
     {
-        private readonly MongoCollection<ServiceMessage> _serviceMessagesCollection;
+        private readonly IMongoCollection<ServiceMessage> _serviceMessagesCollection;
 
         public ServiceMessageRepository(IMongoRepository mongoRepository, string serviceMessagesCollectionName)
         {
             _serviceMessagesCollection = mongoRepository.Database.GetCollection<ServiceMessage>(serviceMessagesCollectionName);
         }
 
-        public IList<ServiceMessage> Find()
+        public Task<List<ServiceMessage>> Find()
         {
-            return _serviceMessagesCollection.AsQueryable().ToList();
+            return _serviceMessagesCollection.Find(FilterDefinition<ServiceMessage>.Empty).ToListAsync();
         }
 
-        public void EnsureIndex()
+        public async Task EnsureIndex()
         {
-            _serviceMessagesCollection.CreateIndex(IndexKeys<ServiceMessage>.Ascending(x => x.In).Ascending(x => x.Out));
+            await _serviceMessagesCollection.Indexes.CreateOneAsync(Builders<ServiceMessage>.IndexKeys.Ascending(x => x.In).Ascending(x => x.Out));
         }
     }
 }

@@ -15,11 +15,9 @@
 //Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
-using MongoDB.Driver.Linq;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
 
@@ -27,48 +25,52 @@ namespace ServiceConnect.Monitor.Repositories
 {
     public class ServiceRepository : IServiceRepository
     {
-        private readonly MongoCollection<Service> _serviceCollection;
+        private readonly IMongoCollection<Service> _serviceCollection;
 
         public ServiceRepository(IMongoRepository mongoRepository, string servicesCollectionName)
         {
             _serviceCollection = mongoRepository.Database.GetCollection<Service>(servicesCollectionName);
         }
 
-        public void EnsureIndex()
+        public async Task EnsureIndex()
         {
-            _serviceCollection.CreateIndex(IndexKeys<Service>.Ascending(x => x.Name).Ascending(x => x.InstanceLocation));
-            _serviceCollection.CreateIndex(IndexKeys<Service>.Ascending(x => x.Name));
-            _serviceCollection.CreateIndex(IndexKeys<Service>.Ascending(x => x.Tags));
+            await _serviceCollection.Indexes.CreateOneAsync(Builders<Service>.IndexKeys.Ascending(x => x.Name).Ascending(x => x.InstanceLocation));
+            await _serviceCollection.Indexes.CreateOneAsync(Builders<Service>.IndexKeys.Ascending(x => x.Name));
+            await _serviceCollection.Indexes.CreateOneAsync(Builders<Service>.IndexKeys.Ascending(x => x.Tags));
         }
 
-        public IList<Service> Find()
+        public Task<List<Service>> Find()
         {
-            return _serviceCollection.AsQueryable().ToList();
+            return _serviceCollection.Find(FilterDefinition<Service>.Empty).ToListAsync();
         }
 
-        public Service Find(string name, string location)
+        public Task<Service> Find(string name, string location)
         {
-            return _serviceCollection.AsQueryable().FirstOrDefault(x => x.Name == name && x.InstanceLocation == location);
+            return _serviceCollection.Find(
+                    Builders<Service>.Filter.And(
+                        Builders<Service>.Filter.Eq(x => x.Name, name),
+                        Builders<Service>.Filter.Eq(x => x.InstanceLocation, location)))
+                .SingleAsync();
         }
 
-        public IList<Service> FindByName(string name)
+        public Task<List<Service>> FindByName(string name)
         {
-            return _serviceCollection.AsQueryable().Where(x => x.Name == name).ToList();
+            return _serviceCollection.Find(Builders<Service>.Filter.Eq(x => x.Name, name)).ToListAsync();
         }
 
-        public void Update(Service model)
+        public async Task Update(Service model)
         {
-            _serviceCollection.Save(model);
+            await _serviceCollection.ReplaceOneAsync(Builders<Service>.Filter.Eq(x => x.Id, model.Id), model, new UpdateOptions {IsUpsert = true});
         }
 
-        public Service Get(ObjectId id)
+        public Task<Service> Get(ObjectId id)
         {
-            return _serviceCollection.FindOneById(id);
+            return _serviceCollection.Find(Builders<Service>.Filter.Eq(x => x.Id, id)).SingleAsync();
         }
 
-        public void Delete(ObjectId id)
+        public async Task Delete(ObjectId id)
         {
-            _serviceCollection.Remove(Query<Service>.EQ(x => x.Id, id));
+            await _serviceCollection.DeleteOneAsync(Builders<Service>.Filter.Eq(x => x.Id, id));
         }
     }
 }

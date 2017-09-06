@@ -14,6 +14,7 @@
 //along with this program; if not, write to the Free Software
 //Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
@@ -22,21 +23,21 @@ namespace ServiceConnect.Monitor.Repositories
 {
     public class SettingsRepository : ISettingsRepository
     {
-        private readonly MongoCollection<Settings> _settingsRepository;
+        private readonly IMongoCollection<Settings> _settingsRepository;
 
         public SettingsRepository(IMongoRepository mongoRepository, string settingsCollectionName)
         {
             _settingsRepository = mongoRepository.Database.GetCollection<Settings>(settingsCollectionName);
         }
         
-        public Settings Get()
+        public Task<Settings> Get()
         {
-            return _settingsRepository.FindOne();
+            return _settingsRepository.Find(FilterDefinition<Settings>.Empty).SingleOrDefaultAsync();
         }
 
-        public void Update(Settings model)
+        public async Task Update(Settings model)
         {
-            _settingsRepository.Save(model);
+            await _settingsRepository.ReplaceOneAsync(Builders<Settings>.Filter.Eq(x => x.Id, model.Id), model, new UpdateOptions {IsUpsert = true});
         }
     }
 }
