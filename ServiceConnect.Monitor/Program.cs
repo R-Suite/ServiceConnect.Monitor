@@ -117,7 +117,7 @@ namespace ServiceConnect.Monitor
                     Id = Guid.NewGuid(),
                     Environments = new List<Models.Environment>(),
                     KeepAuditsFor = "7",
-                    KeepErrorsFor = "Forever",
+                    KeepErrorsFor = "150",
                     KeepHeartbeatsFor = "7"
                 };
                 settingsRepository.Update(settings);
