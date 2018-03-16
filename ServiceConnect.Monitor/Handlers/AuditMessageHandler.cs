@@ -49,17 +49,17 @@ namespace ServiceConnect.Monitor.Handlers
                 Body = message,
                 DestinationAddress = headers["DestinationAddress"],
                 DestinationMachine = headers["DestinationMachine"],
-                FullTypeName = headers["FullTypeName"],
-                MessageId = headers["MessageId"],
-                MessageType = headers["MessageType"],
-                SourceAddress = headers["SourceAddress"],
-                SourceMachine = headers["SourceMachine"],
-                TypeName = headers["TypeName"],
-                ConsumerType = headers["ConsumerType"],
-                TimeProcessed = DateTime.ParseExact(headers["TimeProcessed"], "O", CultureInfo.InvariantCulture),
-                TimeReceived = DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture),
-                TimeSent = DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture),
-                Language = headers["Language"],
+                FullTypeName = headers.ContainsKey("FullTypeName") ? headers["FullTypeName"] : null,
+                MessageId = headers.ContainsKey("MessageId") ? headers["MessageId"] : null,
+                MessageType = headers.ContainsKey("MessageType") ? headers["MessageType"] : null,
+                SourceAddress = headers.ContainsKey("SourceAddress") ? headers["SourceAddress"] : null,
+                SourceMachine = headers.ContainsKey("SourceMachine") ? headers["SourceMachine"] : null,
+                TypeName = headers.ContainsKey("TypeName") ? headers["TypeName"] : null,
+                ConsumerType = headers.ContainsKey("ConsumerType") ? headers["ConsumerType"] : null,
+                TimeProcessed = headers.ContainsKey("TimeProcessed") ? DateTime.ParseExact(headers["TimeProcessed"], "O", CultureInfo.InvariantCulture) : DateTime.MinValue,
+                TimeReceived = headers.ContainsKey("TimeReceived") ? DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture) : DateTime.MinValue,
+                TimeSent = headers.ContainsKey("TimeSent") ? DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture) : DateTime.MinValue,
+                Language = headers.ContainsKey("Language") ? headers["Language"] : null,
                 CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId,
                 Server = host,
                 Headers = headers
@@ -69,6 +69,7 @@ namespace ServiceConnect.Monitor.Handlers
 
             lock (_lock)
                 _audits.Add(audit);
+
         }
 
         private void SendAudits(object state)

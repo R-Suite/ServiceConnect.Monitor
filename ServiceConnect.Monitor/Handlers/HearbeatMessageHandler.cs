@@ -44,7 +44,6 @@ namespace ServiceConnect.Monitor.Handlers
         public async Task Execute(string message, IDictionary<string, string> headers, string host)
         {
             var heartbeat = JsonConvert.DeserializeObject<Heartbeat>(message);
-
             await _heartbeatRepository.InsertHeartbeat(heartbeat);
 
             lock (_lock)
