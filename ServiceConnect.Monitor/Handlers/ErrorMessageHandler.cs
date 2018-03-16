@@ -43,45 +43,38 @@ namespace ServiceConnect.Monitor.Handlers
 
         public void Execute(string message, IDictionary<string, string> headers, string host)
         {
-            lock (_lock)
+            var error = new Error
             {
-                var error = new Error
-                {
-                    Body = message,
-                    DestinationAddress = headers["DestinationAddress"],
-                    DestinationMachine = headers["DestinationMachine"],
-                    FullTypeName = headers["FullTypeName"],
-                    MessageId = headers["MessageId"],
-                    MessageType = headers["MessageType"],
-                    SourceAddress = headers["SourceAddress"],
-                    SourceMachine = headers["SourceMachine"],
-                    TypeName = headers["TypeName"],
-                    ConsumerType = headers["ConsumerType"],
-                    TimeProcessed = DateTime.ParseExact(headers["TimeProcessed"], "O", CultureInfo.InvariantCulture),
-                    TimeReceived = DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture),
-                    TimeSent = DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture),
-                    Exception = JsonConvert.DeserializeObject<MessageException>(headers["Exception"]),
-                    Language = headers["Language"],
-                    CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId,
-                    Server = host,
-                    Headers = headers
-                };
-
-                _errorRepository.InsertError(error);
-
-                _errors.Add(error);
-            }
+                Body = message,
+                DestinationAddress = headers["DestinationAddress"],
+                DestinationMachine = headers["DestinationMachine"],
+                FullTypeName = headers.ContainsKey("FullTypeName") ? headers["FullTypeName"] : null,
+                MessageId = headers.ContainsKey("MessageId") ? headers["MessageId"] : null,
+                MessageType = headers.ContainsKey("MessageType") ? headers["MessageType"] : null,
+                SourceAddress = headers.ContainsKey("SourceAddress") ? headers["SourceAddress"] : null,
+                SourceMachine = headers.ContainsKey("SourceMachine") ? headers["SourceMachine"] : null,
+                TypeName = headers.ContainsKey("TypeName") ? headers["TypeName"] : null,
+                ConsumerType = headers.ContainsKey("ConsumerType") ? headers["ConsumerType"] : null,
+                TimeProcessed = headers.ContainsKey("TimeProcessed") ? DateTime.ParseExact(headers["TimeProcessed"], "O", CultureInfo.InvariantCulture) : DateTime.MinValue,
+                TimeReceived = headers.ContainsKey("TimeReceived") ? DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture) : DateTime.MinValue,
+                TimeSent = headers.ContainsKey("TimeSent") ? DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture) : DateTime.MinValue,
+                Language = headers.ContainsKey("Language") ? headers["Language"] : null,
+                CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId,
+                Exception = JsonConvert.DeserializeObject<MessageException>(headers["Exception"]),
+                Server = host,
+                Headers = headers
+            };
+            
+            _errorRepository.InsertError(error);
+            _errors.Add(error);
         }
 
         private void SendErrors(object state)
         {
-            lock (_lock)
+            if (_errors.Count > 0)
             {
-                if (_errors.Count > 0)
-                {
-                    _hub.Clients.All.Errors(_errors);
-                    _errors.Clear();
-                }
+                _hub.Clients.All.Errors(_errors);
+                _errors.Clear();
             }
         }
 

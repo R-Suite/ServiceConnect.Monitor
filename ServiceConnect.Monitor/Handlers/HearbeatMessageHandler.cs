@@ -44,23 +44,14 @@ namespace ServiceConnect.Monitor.Handlers
         {
             var heartbeat = JsonConvert.DeserializeObject<Heartbeat>(message);
 
-            lock (_lock)
-            {
-                _heartbeatRepository.InsertHeartbeat(heartbeat);
-                _heartbeats.Add(heartbeat);
-            }
+            _heartbeatRepository.InsertHeartbeat(heartbeat);
+            _heartbeats.Add(heartbeat);
         }
 
         private void SendHeartbeats(object state)
         {
-            lock (_lock)
-            {
-                if (_heartbeats.Count > 0)
-                {
-                    _hub.Clients.All.Heartbeats(_heartbeats);
-                    _heartbeats.Clear();
-                }
-            }
+            _hub.Clients.All.Heartbeats(_heartbeats);
+            _heartbeats.Clear();
         }
 
         public void Dispose()
