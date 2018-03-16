@@ -109,7 +109,7 @@ namespace ServiceConnect.Monitor
             var heartbeatHub = GlobalHost.ConnectionManager.GetHubContext<HeartbeatHub>();
 
             var settingsRepository  = _container.GetInstance<ISettingsRepository>();
-            var settings = settingsRepository.Get();
+            var settings = settingsRepository.Get().GetAwaiter().GetResult();
             if (settings == null)
             {
                 settings = new Settings
@@ -127,16 +127,22 @@ namespace ServiceConnect.Monitor
             
             foreach (var environment in settings.Environments)
             {
+                // Two distinct connections one for receiving and one for sending that way publishing isn't delayed if the socket is busy pulling messages
+                var receivingConnection = new Connection(environment);
+                var sendingConnection = new Connection(environment);
+
                 var consumerEnvironment = new ConsumerEnvironment
                 {
                     Server = environment.Server,
                     AuditMessageHandler = new AuditMessageHandler(_container.GetInstance<IAuditRepository>(), auditHub),
                     ErrorMessageHandler = new ErrorMessageHandler(_container.GetInstance<IErrorRepository>(), errorHub),
                     HeartbeatMessageHandler = new HearbeatMessageHandler(_container.GetInstance<IHeartbeatRepository>(), heartbeatHub),
-                    AuditConsumer = new Consumer(environment),
-                    ErrorConsumer = new Consumer(environment),
-                    HeartbeatConsumer = new Consumer(environment),
-                    Producer = new Producer(environment)
+                    ReceivingConnection = receivingConnection,
+                    SendingConnection = sendingConnection,
+                    AuditConsumer = new ConsumerPool(receivingConnection),
+                    ErrorConsumer = new ConsumerPool(receivingConnection),
+                    HeartbeatConsumer = new ConsumerPool(receivingConnection),
+                    Producer = new Producer(sendingConnection)
                 };
                 string forwardErrorQueue = null;
                 string forwardAuditQueue = null;
@@ -206,6 +212,9 @@ namespace ServiceConnect.Monitor
                 environment.AuditConsumer.Dispose();
                 environment.ErrorConsumer.Dispose();
                 environment.HeartbeatConsumer.Dispose();
+                environment.Producer.Dispose();
+                environment.ReceivingConnection.Dispose();
+                environment.SendingConnection.Dispose();
             }
 
             foreach (var timer in Globals.Timers)

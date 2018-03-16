@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
@@ -20,26 +21,26 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("errors")]
-        public IList<Error> FindErrors(Guid correlationId)
+        public async Task<IList<Error>> FindErrors(Guid correlationId)
         {
-            return _errorRepository.Find(correlationId);
+            return await _errorRepository.Find(correlationId);
         }
 
         [AcceptVerbs("GET")]
         [Route("errors")]
-        public IList<Error> FindErrors(DateTime from, DateTime to, string tags = null)
+        public async Task<IList<Error>> FindErrors(DateTime from, DateTime to, string tags = null)
         {
             List<string> tagList = null;
             if (!string.IsNullOrEmpty(tags))
                 tagList = tags.Split(',').ToList();
 
-            var errors = _errorRepository.Find(from, to);
+            var errors = await _errorRepository.Find(from, to);
 
             if (tagList != null && tagList.Count > 0)
             {
                 var results = new List<Error>();
 
-                var services = _serviceRepository.Find();
+                var services = await _serviceRepository.Find();
 
                 foreach (Error error in errors)
                 {
@@ -56,14 +57,14 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("error/{id}")]
-        public Error Get(string id)
+        public async Task<Error> Get(string id)
         {
-            return _errorRepository.Get(new Guid(id));
+            return await _errorRepository.Get(new Guid(id));
         }
 
         [AcceptVerbs("POST")]
         [Route("errors/retry")]
-        public bool RetryAll(List<Error> errors) 
+        public async Task<bool> RetryAll(List<Error> errors) 
         {
             foreach (var error in errors)
             {
@@ -74,10 +75,12 @@ namespace ServiceConnect.Monitor.Controllers
                 error.Headers.Remove("DestinationAddress");
                 error.Headers.Remove("RetryCount");
                 error.Headers.Remove("Exception");
+
                 if (env != null)
                 {
                     env.Producer.Send(error.DestinationAddress, error.Body, error.Headers);
-                    _errorRepository.Remove(error.Id);
+
+                    await _errorRepository.Remove(error.Id);
                 }
             }
 

@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.AspNet.SignalR;
 using ServiceConnect.Monitor.Handlers;
@@ -42,14 +43,14 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("settings")]
-        public Settings GetSettings()
+        public async Task<Settings> GetSettings()
         {
-            return _settingsRepository.Get();
+            return await _settingsRepository.Get();
         }
 
         [AcceptVerbs("POST", "PUT")]
         [Route("settings")]
-        public Settings UpdateSettings(Settings model)
+        public async Task<Settings> UpdateSettings(Settings model)
         {
             if (string.IsNullOrEmpty(model.KeepAuditsFor))
                 model.KeepAuditsFor = "Forever";
@@ -60,7 +61,7 @@ namespace ServiceConnect.Monitor.Controllers
             if (string.IsNullOrEmpty(model.KeepHeartbeatsFor))
                 model.KeepHeartbeatsFor = "Forever";
 
-            _settingsRepository.Update(model);
+            await _settingsRepository.Update(model);
 
             if (model.ForwardAudit == false)
                 foreach (var consumerEnvironment in Globals.Environments)
@@ -98,21 +99,29 @@ namespace ServiceConnect.Monitor.Controllers
                 var consumerEnvironment = environments.FirstOrDefault(x => x.Server == environment.Server &&
                                                                            x.Username == environment.Username &&
                                                                            x.Password == environment.Password &&
+                                                                           x.SslEnabled == environment.SslEnabled &&
+                                                                           x.CertBase64 == environment.CertBase64 &&
+                                                                           x.CertPassword == environment.CertPassword &&
                                                                            x.AuditQueue == environment.AuditQueue &&
                                                                            x.ErrorQueue == environment.ErrorQueue &&
                                                                            x.HeartbeatQueue == environment.HeartbeatQueue);
                 if (consumerEnvironment == null)
                 {
+                    var receivingConnection = new Connection(environment);
+                    var sendingConnection = new Connection(environment);
+
                     consumerEnvironment = new ConsumerEnvironment
                     {
                         Server = environment.Server,
                         AuditMessageHandler = new AuditMessageHandler(_auditRepository, auditHub),
                         ErrorMessageHandler = new ErrorMessageHandler(_errorRepository, errorHub),
                         HeartbeatMessageHandler = new HearbeatMessageHandler(_heartbeatRepository, heartbeatHub),
-
-                        AuditConsumer = new Consumer(environment),
-                        ErrorConsumer = new Consumer(environment),
-                        HeartbeatConsumer = new Consumer(environment)
+                        ReceivingConnection = receivingConnection,
+                        SendingConnection = sendingConnection,
+                        AuditConsumer = new ConsumerPool(receivingConnection),
+                        ErrorConsumer = new ConsumerPool(receivingConnection),
+                        HeartbeatConsumer = new ConsumerPool(receivingConnection),
+                        Producer = new Producer(sendingConnection)
                     };
 
                     string forwardErrorQueue = null;
@@ -138,23 +147,29 @@ namespace ServiceConnect.Monitor.Controllers
             foreach (var consumerEnvironment in environments)
             {
                 var environment = model.Environments.FirstOrDefault(x => x.Server == consumerEnvironment.Server &&
-                                                                           x.Username == consumerEnvironment.Username &&
-                                                                           x.Password == consumerEnvironment.Password &&
-                                                                           x.AuditQueue == consumerEnvironment.AuditQueue &&
-                                                                           x.ErrorQueue == consumerEnvironment.ErrorQueue &&
-                                                                           x.HeartbeatQueue == consumerEnvironment.HeartbeatQueue);
+                                                                         x.Username == consumerEnvironment.Username &&
+                                                                         x.Password == consumerEnvironment.Password &&
+                                                                         x.SslEnabled == consumerEnvironment.SslEnabled &&
+                                                                         x.CertBase64 == consumerEnvironment.CertBase64 &&
+                                                                         x.CertPassword == consumerEnvironment.CertPassword &&
+                                                                         x.AuditQueue == consumerEnvironment.AuditQueue &&
+                                                                         x.ErrorQueue == consumerEnvironment.ErrorQueue &&
+                                                                         x.HeartbeatQueue == consumerEnvironment.HeartbeatQueue);
                 if (environment == null)
                     environmentsToRemove.Add(consumerEnvironment);
             }
 
             foreach (var consumerEnvironment in environmentsToRemove)
             {
-                consumerEnvironment.AuditConsumer.Dispose();
-                consumerEnvironment.ErrorConsumer.Dispose();
-                consumerEnvironment.HeartbeatConsumer.Dispose();
                 consumerEnvironment.AuditMessageHandler.Dispose();
                 consumerEnvironment.ErrorMessageHandler.Dispose();
                 consumerEnvironment.HeartbeatMessageHandler.Dispose();
+                consumerEnvironment.AuditConsumer.Dispose();
+                consumerEnvironment.ErrorConsumer.Dispose();
+                consumerEnvironment.HeartbeatConsumer.Dispose();
+                consumerEnvironment.Producer.Dispose();
+                consumerEnvironment.ReceivingConnection.Dispose();
+                consumerEnvironment.SendingConnection.Dispose();
                 environments.Remove(consumerEnvironment);
             }
              

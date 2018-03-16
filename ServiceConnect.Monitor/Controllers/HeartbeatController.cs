@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
@@ -33,9 +34,9 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("heartbeats")]
-        public List<Heartbeat> Find(string name, string location, DateTime from, DateTime to)
+        public async Task<List<Heartbeat>> Find(string name, string location, DateTime from, DateTime to)
         {
-            return _heartbeatRepository.Find(name, location, from, to);
+            return await _heartbeatRepository.Find(name, location, from, to);
         }
     }
 }
