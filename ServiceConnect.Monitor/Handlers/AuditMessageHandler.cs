@@ -44,32 +44,46 @@ namespace ServiceConnect.Monitor.Handlers
 
         public async Task Execute(string message, IDictionary<string, string> headers, string host)
         {
-            var audit = new Audit
+            try
             {
-                Body = message,
-                DestinationAddress = headers["DestinationAddress"],
-                DestinationMachine = headers["DestinationMachine"],
-                FullTypeName = headers.ContainsKey("FullTypeName") ? headers["FullTypeName"] : null,
-                MessageId = headers.ContainsKey("MessageId") ? headers["MessageId"] : null,
-                MessageType = headers.ContainsKey("MessageType") ? headers["MessageType"] : null,
-                SourceAddress = headers.ContainsKey("SourceAddress") ? headers["SourceAddress"] : null,
-                SourceMachine = headers.ContainsKey("SourceMachine") ? headers["SourceMachine"] : null,
-                TypeName = headers.ContainsKey("TypeName") ? headers["TypeName"] : null,
-                ConsumerType = headers.ContainsKey("ConsumerType") ? headers["ConsumerType"] : null,
-                TimeProcessed = headers.ContainsKey("TimeProcessed") ? DateTime.ParseExact(headers["TimeProcessed"], "O", CultureInfo.InvariantCulture) : DateTime.MinValue,
-                TimeReceived = headers.ContainsKey("TimeReceived") ? DateTime.ParseExact(headers["TimeReceived"], "O", CultureInfo.InvariantCulture) : DateTime.MinValue,
-                TimeSent = headers.ContainsKey("TimeSent") ? DateTime.ParseExact(headers["TimeSent"], "O", CultureInfo.InvariantCulture) : DateTime.MinValue,
-                Language = headers.ContainsKey("Language") ? headers["Language"] : null,
-                CorrelationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId,
-                Server = host,
-                Headers = headers
-            };
+                Guid? correlationId = null;
+                try
+                {
+                    correlationId = JsonConvert.DeserializeObject<Message>(message).CorrelationId;
+                }
+                catch
+                { }
 
-            await _auditRepository.InsertAudit(audit);
+                var audit = new Audit
+                {
+                    Body = message,
+                    DestinationAddress = headers["DestinationAddress"],
+                    DestinationMachine = headers["DestinationMachine"],
+                    FullTypeName = headers.ContainsKey("FullTypeName") ? headers["FullTypeName"] : null,
+                    MessageId = headers.ContainsKey("MessageId") ? headers["MessageId"] : null,
+                    MessageType = headers.ContainsKey("MessageType") ? headers["MessageType"] : null,
+                    SourceAddress = headers.ContainsKey("SourceAddress") ? headers["SourceAddress"] : null,
+                    SourceMachine = headers.ContainsKey("SourceMachine") ? headers["SourceMachine"] : null,
+                    TypeName = headers.ContainsKey("TypeName") ? headers["TypeName"] : null,
+                    ConsumerType = headers.ContainsKey("ConsumerType") ? headers["ConsumerType"] : null,
+                    TimeProcessed = headers.ContainsKey("TimeProcessed") ? DateTime.Parse(headers["TimeProcessed"]) : DateTime.MinValue,
+                    TimeReceived = headers.ContainsKey("TimeReceived") ? DateTime.Parse(headers["TimeReceived"]) : DateTime.MinValue,
+                    TimeSent = headers.ContainsKey("TimeSent") ? DateTime.Parse(headers["TimeSent"]) : DateTime.MinValue,
+                    Language = headers.ContainsKey("Language") ? headers["Language"] : null,
+                    CorrelationId = correlationId,
+                    Server = host,
+                    Headers = headers
+                };
 
-            lock (_lock)
-                _audits.Add(audit);
+                await _auditRepository.InsertAudit(audit);
 
+                lock (_lock)
+                    _audits.Add(audit);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         private void SendAudits(object state)
