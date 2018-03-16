@@ -37,7 +37,7 @@ namespace ServiceConnect.Monitor.Models
         public string Body { get; set; }
         public string ConsumerType { get; set; }
         public string Language { get; set; }
-        public Guid CorrelationId { get; set; }
+        public Guid? CorrelationId { get; set; }
         public IDictionary<string, string> Headers { get; set; }
         public string Server { get; set; }
     }
