@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using ServiceConnect.Monitor.Interfaces;
@@ -41,7 +42,7 @@ namespace ServiceConnect.Monitor.Handlers
             _timer = new Timer(callback, null, 0, 2500);
         }
 
-        public void Execute(string message, IDictionary<string, string> headers, string host)
+        public async Task Execute(string message, IDictionary<string, string> headers, string host)
         {
             var error = new Error
             {
@@ -64,18 +65,21 @@ namespace ServiceConnect.Monitor.Handlers
                 Server = host,
                 Headers = headers
             };
-            
-            _errorRepository.InsertError(error);
-            _errors.Add(error);
+
+            await _errorRepository.InsertError(error);
+
+            lock (_lock)
+                _errors.Add(error);
         }
 
         private void SendErrors(object state)
         {
-            if (_errors.Count > 0)
-            {
-                _hub.Clients.All.Errors(_errors);
-                _errors.Clear();
-            }
+            lock (_lock)
+                if (_errors.Count > 0)
+                {
+                    _hub.Clients.All.Errors(_errors);
+                    _errors.Clear();
+                }
         }
 
         public void Dispose()

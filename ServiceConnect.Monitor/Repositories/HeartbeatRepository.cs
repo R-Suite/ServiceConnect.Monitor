@@ -16,10 +16,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
-using MongoDB.Driver.Linq;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
 
@@ -27,8 +25,8 @@ namespace ServiceConnect.Monitor.Repositories
 {
     public class HeartbeatRepository : IHeartbeatRepository
     {
-        private readonly MongoCollection<Heartbeat> _heartbeatsCollection;
-        private readonly MongoCollection<Service> _serviceCollection;
+        private readonly IMongoCollection<Heartbeat> _heartbeatsCollection;
+        private readonly IMongoCollection<Service> _serviceCollection;
 
         public HeartbeatRepository(IMongoRepository mongoRepository, string heartbeatCollectionName, string serviceCollectionName)
         {
@@ -36,53 +34,56 @@ namespace ServiceConnect.Monitor.Repositories
             _serviceCollection = mongoRepository.Database.GetCollection<Service>(serviceCollectionName);
         }
 
-        public void InsertHeartbeat(Heartbeat model)
+        public async Task InsertHeartbeat(Heartbeat model)
         {
-            _heartbeatsCollection.Insert(model);
+            await _heartbeatsCollection.InsertOneAsync(model);
 
-            _serviceCollection.Update(
-                Query.And(
-                    Query<Service>.EQ(x => x.Name, model.Name),
-                    Query<Service>.EQ(x => x.InstanceLocation, model.Location)
+            await _serviceCollection.UpdateOneAsync(
+                Builders<Service>.Filter.And(
+                    Builders<Service>.Filter.Eq(x => x.Name, model.Name),
+                    Builders<Service>.Filter.Eq(x => x.InstanceLocation, model.Location)
                 ),
-                Update<Service>.Set(x => x.Language, model.Language).
-                                Set(x => x.ConsumerType, model.ConsumerType).
-                                Set(x => x.LastHeartbeat, model.Timestamp).
-                                Set(x => x.LatestCpu, model.LatestCpu).
-                                Set(x => x.LatestMemory, model.LatestMemory),
-                UpdateFlags.Upsert);
+                Builders<Service>.Update
+                    .Set(x => x.Language, model.Language)
+                    .Set(x => x.ConsumerType, model.ConsumerType)
+                    .Set(x => x.LastHeartbeat, model.Timestamp)
+                    .Set(x => x.LatestCpu, model.LatestCpu)
+                    .Set(x => x.LatestMemory, model.LatestMemory),
+                new UpdateOptions {IsUpsert = true});
         }
 
-        public List<Heartbeat> Find(string name, string location, DateTime @from, DateTime to)
+        public Task<List<Heartbeat>> Find(string name, string location, DateTime @from, DateTime to)
         {
-            var result = _heartbeatsCollection.AsQueryable().Where(x => 
-                x.Timestamp >= from &&
-                x.Timestamp <= to && 
-                x.Name == name &&
-                x.Location == location).OrderByDescending(x => x.Timestamp);
-
-            return result.ToList();
+            return _heartbeatsCollection
+                .Find(
+                    Builders<Heartbeat>.Filter.And(
+                        Builders<Heartbeat>.Filter.Gte(x => x.Timestamp, from),
+                        Builders<Heartbeat>.Filter.Lte(x => x.Timestamp, to),
+                        Builders<Heartbeat>.Filter.Eq(x => x.Name, name),
+                        Builders<Heartbeat>.Filter.Eq(x => x.Location, location)))
+                .Sort(Builders<Heartbeat>.Sort.Descending(x => x.Timestamp))
+                .ToListAsync();
         }
 
-        public void Remove(string name, string location)
+        public async Task Remove(string name, string location)
         {
-            _heartbeatsCollection.Remove(
-                Query.And(
-                    Query<Heartbeat>.EQ(x => x.Name, name),
-                    Query<Heartbeat>.EQ(x => x.Location, location)
+            await _heartbeatsCollection.DeleteManyAsync(
+                Builders<Heartbeat>.Filter.And(
+                    Builders<Heartbeat>.Filter.Eq(x => x.Name, name),
+                    Builders<Heartbeat>.Filter.Eq(x => x.Location, location)
                 )
             );
         }
 
-        public void EnsureIndex()
+        public async Task EnsureIndex()
         {
-            _heartbeatsCollection.CreateIndex(IndexKeys<Heartbeat>.Ascending(x => x.Name).Ascending(x => x.Location).Descending(x => x.Timestamp));
-            _heartbeatsCollection.CreateIndex(IndexKeys<Heartbeat>.Ascending(x => x.Name).Ascending(x => x.Location));
+            await _heartbeatsCollection.Indexes.CreateOneAsync(Builders<Heartbeat>.IndexKeys.Ascending(x => x.Name).Ascending(x => x.Location).Descending(x => x.Timestamp));
+            await _heartbeatsCollection.Indexes.CreateOneAsync(Builders<Heartbeat>.IndexKeys.Ascending(x => x.Name).Ascending(x => x.Location));
         }
 
-        public void Remove(DateTime before)
+        public async Task Remove(DateTime before)
         {
-            _heartbeatsCollection.Remove(Query<Heartbeat>.LT(x => x.Timestamp, before));
+            await _heartbeatsCollection.DeleteManyAsync(Builders<Heartbeat>.Filter.Lt(x => x.Timestamp, before));
         }
     }
 }

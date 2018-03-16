@@ -16,36 +16,35 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using ServiceConnect.Monitor.Interfaces;
-using ServiceConnect.Monitor.Models;
+using Tag = ServiceConnect.Monitor.Models.Tag;
 
 namespace ServiceConnect.Monitor.Repositories
 {
     public class TagRepository : ITagRepository
     {
-        private readonly MongoCollection<Tag> _tagCollection;
+        private readonly IMongoCollection<Models.Tag> _tagCollection;
 
         public TagRepository(IMongoRepository mongoRepository, string tagCollectionName)
         {
-            _tagCollection = mongoRepository.Database.GetCollection<Tag>(tagCollectionName);
+            _tagCollection = mongoRepository.Database.GetCollection<Models.Tag>(tagCollectionName);
         }
 
-        public List<Tag> Find()
+        public Task<List<Tag>> Find()
         {
-            return _tagCollection.AsQueryable().ToList();
+            return _tagCollection.Find(FilterDefinition<Tag>.Empty).ToListAsync();
         }
 
-        public void Insert(string tag)
+        public async Task Insert(string tag)
         {
             var model = new Tag
             {
                 Name = tag,
                 Id = Guid.NewGuid()
             };
-            _tagCollection.Insert(model);
+            await _tagCollection.InsertOneAsync(model);
         }
     }
 }

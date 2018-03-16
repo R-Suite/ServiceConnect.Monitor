@@ -16,11 +16,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using MongoDB.Bson;
+using System.Threading.Tasks;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
-using MongoDB.Driver.Linq;
 using ServiceConnect.Monitor.Interfaces;
 using ServiceConnect.Monitor.Models;
 
@@ -28,49 +25,49 @@ namespace ServiceConnect.Monitor.Repositories
 {
     public class ErrorRepository : IErrorRepository
     {
-        private readonly MongoCollection<Error> _errorCollection;
+        private readonly IMongoCollection<Error> _errorCollection;
 
         public ErrorRepository(IMongoRepository mongoRepository, string errorCollectionName)
         {
             _errorCollection = mongoRepository.Database.GetCollection<Error>(errorCollectionName);
         }
 
-        public void InsertError(Error model)
+        public async Task InsertError(Error model)
         {
-            _errorCollection.Insert(model);
+            await _errorCollection.InsertOneAsync(model);
         }
-        public void EnsureIndex()
+        public async Task EnsureIndex()
         {
-            _errorCollection.CreateIndex(IndexKeys<Error>.Ascending(x => x.TimeSent));
-        }
-
-        public IList<Error> Find(DateTime @from, DateTime to)
-        {
-            var result = _errorCollection.AsQueryable().Where(x =>
-               x.TimeSent >= from &&
-               x.TimeSent <= to).OrderByDescending(x => x.TimeSent);
-
-            return result.ToList();
+            await _errorCollection.Indexes.CreateOneAsync(Builders<Error>.IndexKeys.Ascending(x => x.TimeSent));
         }
 
-        public Error Get(Guid id)
-        {        	
-            return _errorCollection.FindOneById(id);
+        public Task<List<Error>> Find(DateTime @from, DateTime to)
+        {
+            return _errorCollection.Find(
+                Builders<Error>.Filter.And(
+                    Builders<Error>.Filter.Gte(x => x.TimeSent, from),
+                    Builders<Error>.Filter.Lte(x => x.TimeSent, to))
+                ).ToListAsync();
         }
 
-        public void Remove(DateTime before)
+        public Task<Error> Get(Guid id)
         {
-            _errorCollection.Remove(Query<Error>.LT(x => x.TimeSent, before));
+            return _errorCollection.Find(Builders<Error>.Filter.Eq(x => x.Id, id)).SingleAsync();
         }
 
-        public void Remove(Guid id)
+        public Task Remove(DateTime before)
         {
-            _errorCollection.Remove(Query<Error>.EQ(x => x.Id, id));
+            return _errorCollection.DeleteManyAsync(Builders<Error>.Filter.Lt(x => x.TimeSent, before));
         }
 
-        public IList<Error> Find(Guid correlationId)
+        public async Task Remove(Guid id)
         {
-            return _errorCollection.Find(Query<Error>.EQ(x => x.CorrelationId, correlationId)).ToList();
+            await _errorCollection.DeleteOneAsync(Builders<Error>.Filter.Eq(x => x.Id, id));
+        }
+
+        public Task<List<Error>> Find(Guid correlationId)
+        {
+            return _errorCollection.Find(Builders<Error>.Filter.Eq(x => x.CorrelationId, correlationId)).ToListAsync();
         }
     }
 }

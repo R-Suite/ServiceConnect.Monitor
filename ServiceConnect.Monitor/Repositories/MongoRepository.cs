@@ -9,7 +9,7 @@ namespace ServiceConnect.Monitor.Repositories
 {
     public class MongoRepository : IMongoRepository
     {
-        public MongoDatabase Database { get; private set; }
+        public IMongoDatabase Database { get; private set; }
 
         public MongoRepository(
             string mongoConnectionString,
@@ -35,7 +35,7 @@ namespace ServiceConnect.Monitor.Repositories
                         MongoCredential.CreateCredential("admin", mongoUsername, mongoPassword)
                     },
                     ConnectionMode = ConnectionMode.Automatic,
-                    WriteConcern = new WriteConcern { W = WriteConcern.WMajority.W, WTimeout = TimeSpan.FromSeconds(20) },
+                    WriteConcern =  WriteConcern.WMajority,
                     Servers = mongoNodes.Select(x => new MongoServerAddress(x)),
                     SslSettings = new SslSettings
                     {
@@ -50,9 +50,8 @@ namespace ServiceConnect.Monitor.Repositories
 
                 client = new MongoClient(settings);
             }
-
-            var server = client.GetServer();
-            Database = server.GetDatabase(databaseName);
+            
+            Database = client.GetDatabase(databaseName);
         }
     }
 }

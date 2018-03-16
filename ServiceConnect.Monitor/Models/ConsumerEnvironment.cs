@@ -23,9 +23,11 @@ namespace ServiceConnect.Monitor.Models
         public AuditMessageHandler AuditMessageHandler { get; set; }
         public ErrorMessageHandler ErrorMessageHandler { get; set; }
         public HearbeatMessageHandler HeartbeatMessageHandler { get; set; }
-        public Consumer AuditConsumer { get; set; }
-        public Consumer ErrorConsumer { get; set; }
-        public Consumer HeartbeatConsumer { get; set; }
+        public Connection ReceivingConnection { get; set; }
+        public Connection SendingConnection { get; set; }
+        public ConsumerPool AuditConsumer { get; set; }
+        public ConsumerPool ErrorConsumer { get; set; }
+        public ConsumerPool HeartbeatConsumer { get; set; }
         public Producer Producer { get; set; }
     }
 }

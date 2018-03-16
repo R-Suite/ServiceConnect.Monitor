@@ -16,19 +16,19 @@
 
 using System;
 using System.Collections.Generic;
-using MongoDB.Bson;
+using System.Threading.Tasks;
 using ServiceConnect.Monitor.Models;
 
 namespace ServiceConnect.Monitor.Interfaces
 {
     public interface IErrorRepository
     {
-        void InsertError(Error model);
-        void EnsureIndex();
-        IList<Error> Find(DateTime @from, DateTime to);
-        Error Get(Guid id);
-        void Remove(DateTime before);
-        IList<Error> Find(Guid correlationId);
-        void Remove(Guid guid);
+        Task InsertError(Error model);
+        Task EnsureIndex();
+        Task<List<Error>> Find(DateTime @from, DateTime to);
+        Task<Error> Get(Guid id);
+        Task Remove(DateTime before);
+        Task<List<Error>> Find(Guid correlationId);
+        Task Remove(Guid guid);
     }
 }

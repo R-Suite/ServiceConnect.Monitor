@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using ServiceConnect.Monitor.Interfaces;
@@ -40,18 +41,23 @@ namespace ServiceConnect.Monitor.Handlers
             _timer = new Timer(callback, null, 0, 2500);
         }
 
-        public void Execute(string message, IDictionary<string, string> headers, string host)
+        public async Task Execute(string message, IDictionary<string, string> headers, string host)
         {
             var heartbeat = JsonConvert.DeserializeObject<Heartbeat>(message);
+            await _heartbeatRepository.InsertHeartbeat(heartbeat);
 
-            _heartbeatRepository.InsertHeartbeat(heartbeat);
-            _heartbeats.Add(heartbeat);
+            lock (_lock)
+                _heartbeats.Add(heartbeat);
         }
 
         private void SendHeartbeats(object state)
         {
-            _hub.Clients.All.Heartbeats(_heartbeats);
-            _heartbeats.Clear();
+            lock (_lock)
+                if (_heartbeats.Count > 0)
+                {
+                    _hub.Clients.All.Heartbeats(_heartbeats);
+                    _heartbeats.Clear();
+                }
         }
 
         public void Dispose()

@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using MongoDB.Bson;
 using ServiceConnect.Monitor.Interfaces;
@@ -37,26 +38,26 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("audits")]
-        public IList<Audit> FindAudits(Guid correlationId)
+        public async Task<IList<Audit>> FindAudits(Guid correlationId)
         {
-            return _auditRepository.Find(correlationId);
+            return await _auditRepository.Find(correlationId);
         }
 
         [AcceptVerbs("GET")]
         [Route("audits")]
-        public IList<Audit> FindAudits(DateTime from, DateTime to, string tags = null)
+        public async Task<IList<Audit>> FindAudits(DateTime from, DateTime to, string tags = null)
         {
             List<string> tagList = null;
             if (!string.IsNullOrEmpty(tags))
                 tagList = tags.Split(',').ToList();
 
-            var audits = _auditRepository.Find(from, to);
+            var audits = await _auditRepository.Find(from, to);
 
             if (tagList != null && tagList.Count > 0)
             {
                 var results = new List<Audit>();
 
-                var services = _serviceRepository.Find();
+                var services = await _serviceRepository.Find();
 
                 foreach (var audit in audits)
                 {
@@ -73,9 +74,9 @@ namespace ServiceConnect.Monitor.Controllers
 
         [AcceptVerbs("GET")]
         [Route("audit/{id}")]
-        public Audit Get(string id)
+        public async Task<Audit> Get(string id)
         {
-            return _auditRepository.Get(new ObjectId(id));
+            return await _auditRepository.Get(new ObjectId(id));
         }
     }
 }

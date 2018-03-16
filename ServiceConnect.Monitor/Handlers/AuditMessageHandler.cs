@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using ServiceConnect.Monitor.Interfaces;
@@ -41,7 +42,7 @@ namespace ServiceConnect.Monitor.Handlers
             _timer = new Timer(callback, null, 0, 2500);
         }
 
-        public void Execute(string message, IDictionary<string, string> headers, string host)
+        public async Task Execute(string message, IDictionary<string, string> headers, string host)
         {
             var audit = new Audit
             {
@@ -64,17 +65,21 @@ namespace ServiceConnect.Monitor.Handlers
                 Headers = headers
             };
 
-            _auditRepository.InsertAudit(audit);
-            _audits.Add(audit);
+            await _auditRepository.InsertAudit(audit);
+
+            lock (_lock)
+                _audits.Add(audit);
+
         }
 
         private void SendAudits(object state)
         {
-            if (_audits.Count > 0)
-            {
-                _hub.Clients.All.Audits(_audits);
-                _audits.Clear();
-            }
+            lock (_lock)
+                if (_audits.Count > 0)
+                {
+                    _hub.Clients.All.Audits(_audits);
+                    _audits.Clear();
+                }
         }
 
         public void Dispose()
