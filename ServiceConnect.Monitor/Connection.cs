@@ -42,6 +42,11 @@ namespace ServiceConnect.Monitor
                 TopologyRecoveryEnabled = true
             };
 
+            if (!string.IsNullOrEmpty(Environment.VirtualHost))
+            {
+                connectionFactory.VirtualHost = Environment.VirtualHost;
+            }
+
             var hostnames = Environment.Server.Split(',', ';');
 
             if (Environment.SslEnabled)
@@ -52,7 +57,7 @@ namespace ServiceConnect.Monitor
                     AcceptablePolicyErrors = SslPolicyErrors.None,
                     ServerName = hostnames.First(),
                     CertPassphrase = Environment.CertPassword,
-                    Certs = new X509Certificate2Collection {new X509Certificate2(Convert.FromBase64String(Environment.CertBase64), Environment.CertPassword)},
+                    Certs = !string.IsNullOrEmpty(Environment.CertBase64) ? new X509Certificate2Collection {new X509Certificate2(Convert.FromBase64String(Environment.CertBase64), Environment.CertPassword)} : null,
                     CertificateSelectionCallback = null,
                     CertificateValidationCallback = null
                 };

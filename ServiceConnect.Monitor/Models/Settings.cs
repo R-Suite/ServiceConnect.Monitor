@@ -32,5 +32,6 @@ namespace ServiceConnect.Monitor.Models
         public string KeepAuditsFor { get; set; }
         public string KeepHeartbeatsFor { get; set; }
         public Guid Id { get; set; }
+        public string VirtualHost { get; set; }
     }
 }

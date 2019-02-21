@@ -142,7 +142,8 @@ namespace ServiceConnect.Monitor
                     AuditConsumer = new ConsumerPool(receivingConnection),
                     ErrorConsumer = new ConsumerPool(receivingConnection),
                     HeartbeatConsumer = new ConsumerPool(receivingConnection),
-                    Producer = new Producer(sendingConnection)
+                    Producer = new Producer(sendingConnection),
+                    VirtualHost = environment.VirtualHost
                 };
                 string forwardErrorQueue = null;
                 string forwardAuditQueue = null;

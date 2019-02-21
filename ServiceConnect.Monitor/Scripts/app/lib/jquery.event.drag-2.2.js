@@ -306,7 +306,7 @@
                     }
                 while (++i < len)
                 // restore the original event & type
-                    event.type = orig.type;
+                event.type = orig.type;
                 event.originalEvent = orig.event;
                 // return all handler results
                 return drag.flatten(dd.results);

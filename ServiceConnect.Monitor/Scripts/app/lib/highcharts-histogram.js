@@ -40,7 +40,7 @@
         var b = binLow * binCount / (binHigh - binLow);
         for (var i = 0; i < n; i++) {
             var bin = Math.min(Math.floor(a * data[i] - b), binCount - 1);
-            binData[bin] ++;
+            binData[bin]++;
         }
 
         var options = H.merge({ // default settings

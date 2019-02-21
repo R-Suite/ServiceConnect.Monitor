@@ -47,6 +47,9 @@ define(['backbone',
             name: "SslEnabled",
             cell: "boolean"
         }, {
+            name: "VirtualHost",
+            cell: "string"
+        }, {
             name: "CertBase64",
             cell: "string"
         }, {

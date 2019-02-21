@@ -27,6 +27,6 @@ namespace ServiceConnect.Monitor.Models
         public bool SslEnabled { get; set; }
         public string CertBase64 { get; set; }
         public string CertPassword { get; set; }
-
+        public string VirtualHost { get; set; }
     }
 }

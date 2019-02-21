@@ -104,7 +104,8 @@ namespace ServiceConnect.Monitor.Controllers
                                                                            x.CertPassword == environment.CertPassword &&
                                                                            x.AuditQueue == environment.AuditQueue &&
                                                                            x.ErrorQueue == environment.ErrorQueue &&
-                                                                           x.HeartbeatQueue == environment.HeartbeatQueue);
+                                                                           x.HeartbeatQueue == environment.HeartbeatQueue &&
+                                                                           x.VirtualHost == environment.VirtualHost);
                 if (consumerEnvironment == null)
                 {
                     var receivingConnection = new Connection(environment);
@@ -121,7 +122,8 @@ namespace ServiceConnect.Monitor.Controllers
                         AuditConsumer = new ConsumerPool(receivingConnection),
                         ErrorConsumer = new ConsumerPool(receivingConnection),
                         HeartbeatConsumer = new ConsumerPool(receivingConnection),
-                        Producer = new Producer(sendingConnection)
+                        Producer = new Producer(sendingConnection),
+                        VirtualHost = environment.VirtualHost
                     };
 
                     string forwardErrorQueue = null;
@@ -154,7 +156,8 @@ namespace ServiceConnect.Monitor.Controllers
                                                                          x.CertPassword == consumerEnvironment.CertPassword &&
                                                                          x.AuditQueue == consumerEnvironment.AuditQueue &&
                                                                          x.ErrorQueue == consumerEnvironment.ErrorQueue &&
-                                                                         x.HeartbeatQueue == consumerEnvironment.HeartbeatQueue);
+                                                                         x.HeartbeatQueue == consumerEnvironment.HeartbeatQueue &&
+                                                                         x.VirtualHost == consumerEnvironment.VirtualHost);
                 if (environment == null)
                     environmentsToRemove.Add(consumerEnvironment);
             }
